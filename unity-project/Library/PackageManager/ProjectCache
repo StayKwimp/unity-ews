@@ -5,16 +5,16 @@ m_ProjectFiles:
     m_ContentTrackingEnabled: 1
     m_ModificationDate:
       serializedVersion: 2
-      ticks: 638240566453456497
-    m_Hash: 111668099
+      ticks: 638240570067040722
+    m_Hash: 3237966592
   m_LockFileStatus:
     m_FilePath: F:/unity/unity-ews/unity-project/Packages/packages-lock.json
     m_PathExists: 1
     m_ContentTrackingEnabled: 1
     m_ModificationDate:
       serializedVersion: 2
-      ticks: 638240566517183061
-    m_Hash: 1276373798
+      ticks: 638240570067040722
+    m_Hash: 3092597306
 m_EmbeddedPackageManifests:
   m_ManifestsStatus: {}
 m_LocalPackages:

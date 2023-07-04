@@ -12,9 +12,9 @@ TagManager:
   - Water
   - UI
   - whatIsGround
-  - 
-  - 
-  - 
+  - whatIsWall
+  - whatIsEnemy
+  - whatIsPlayer
   - 
   - 
   - 

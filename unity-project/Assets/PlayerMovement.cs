@@ -118,7 +118,7 @@ public class PlayerMovement : MonoBehaviour
 
 
         // controleer of de speler op de grond staat en dat hij klaar is om te springen
-        if (Input.GetKey(jumpKey) && readyToJump && grounded) {
+        if (Input.GetKeyDown(jumpKey) && readyToJump && grounded) {
             
             readyToJump = false;
 
