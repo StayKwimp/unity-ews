@@ -27,6 +27,7 @@ public class EnemyMovement : MonoBehaviour
     public float sightRange, attackRange;
     public bool playerInSightRange, playerInAttackRange;
 
+    // dit is een github test
 
     private void Awake() {
         // vind de speler
