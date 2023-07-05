@@ -27,6 +27,11 @@ public class PlayerMovement : MonoBehaviour
     public bool toggleCrouch;
     private float startYScale;
 
+    [Header("Gun Scale Fix")]
+    public Transform playerGunTransform;
+    public float gunCrouchZScale;
+    private float gunStartZScale;
+
     // key bindings
     [Header("Keybinds")]
     public KeyCode jumpKey = KeyCode.Space;
@@ -80,6 +85,7 @@ public class PlayerMovement : MonoBehaviour
 
         // sla de normale Yscale van de player op
         startYScale = transform.localScale.y;
+        gunStartZScale = playerGunTransform.localScale.z;
     }
 
 
@@ -164,18 +170,23 @@ public class PlayerMovement : MonoBehaviour
 
 
             if (state == movementState.crouching) {
-                // begin met crouchen
+                // stop met crouchen
                 state = movementState.walking;
                 
                 // maak de speler weer normaal
                 transform.localScale = new Vector3(transform.localScale.x, startYScale, transform.localScale.z);
+                playerGunTransform.localScale = new Vector3(playerGunTransform.localScale.x, playerGunTransform.localScale.y, gunStartZScale);
+
             }
             else {
-                // stop met crouchen
+                // begin met crouchen
                 state = movementState.crouching;
 
                 // maak de speler kleiner qua hoogte
                 transform.localScale = new Vector3(transform.localScale.x, crouchYScale, transform.localScale.z);
+                playerGunTransform.localScale = new Vector3(playerGunTransform.localScale.x, playerGunTransform.localScale.y, gunCrouchZScale);
+                
+                
 
                 // als je de speler kleiner maakt op de Y-as zorgt het er ook voor dat ie in de lucht gaat vliegen
                 // daarom moeten we een kracht naar beneden maken die één keer wordt geactiveerd
