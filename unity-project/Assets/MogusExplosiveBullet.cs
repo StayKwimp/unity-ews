@@ -65,7 +65,7 @@ public class MogusExplosiveBullet : MonoBehaviour
         Collider[] players = Physics.OverlapSphere(transform.position, explosionRange, whatIsEnemies);
 
         for (int i = 0; i < players.Length; i++) {
-            // verkrijg de script component van de enemy en voer de functie TakeDamage erop uit
+            // verkrijg de script component van de player en voer de functie TakeDamage erop uit
             
             players[i].GetComponent<PlayerMovement>().TakeDamage(explosionDamage);
 
@@ -75,7 +75,7 @@ public class MogusExplosiveBullet : MonoBehaviour
             }
         }
 
-        // sloop de bullet wat later om bugs te voorkomen\
+        // sloop de bullet wat later om bugs te voorkomen
         Invoke("DestroyBullet", 0.05f);
     }
 
@@ -88,8 +88,8 @@ public class MogusExplosiveBullet : MonoBehaviour
     private void OnCollisionEnter(Collision collision) {
         collisions++;
 
-        // explode als de bullet een enemy raakt
-        if (collision.collider.CompareTag("Enemy") && explodeOnTouch) Explode();
+        // explode als de bullet de player raakt
+        if (collision.collider.CompareTag("Player") && explodeOnTouch) Explode();
     }
 
     private void Setup() {

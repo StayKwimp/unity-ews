@@ -87,6 +87,9 @@ public class PlayerMovement : MonoBehaviour
         // zorg dat de player niet omvalt (rotation freezen)
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
+
+        // verander StartYScale
+        startYScale = transform.localScale.y;
     }
 
 
