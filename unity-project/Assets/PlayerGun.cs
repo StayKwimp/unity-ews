@@ -27,6 +27,8 @@ public class PlayerGun : MonoBehaviour
     public Camera playerCam;
     public Transform attackPoint;
 
+    public float bulletMaxTime;
+
 
     // graphics
     [Header("Graphics")]
@@ -124,6 +126,9 @@ public class PlayerGun : MonoBehaviour
         currentBullet.GetComponent<Rigidbody>().AddForce(directionWithSpread.normalized * shootForce, ForceMode.Impulse);
         // nog upward forces toevoegen (alleen voor grenades)
         currentBullet.GetComponent<Rigidbody>().AddForce(playerCam.transform.up * upwardForce, ForceMode.Impulse);
+
+
+        currentBullet.GetComponent<PlayerBullet>().DestroyBulletTimed(bulletMaxTime);
 
 
 

@@ -8,6 +8,7 @@ public class MogusExplosiveBullet : MonoBehaviour
     public Rigidbody rb;
     public GameObject explosion;
     public LayerMask whatIsEnemies;
+    public LayerMask whatIsPlayer;
 
 
     [Header("Properties")]
@@ -18,6 +19,7 @@ public class MogusExplosiveBullet : MonoBehaviour
     [Header("Bullet stats")]
     public int explosionDamage;
     public float explosionRange;
+    public float explosionForce;
 
     public int maxCollisions;
     public float maxLifetime;
@@ -52,6 +54,25 @@ public class MogusExplosiveBullet : MonoBehaviour
             // verkrijg de script component van de enemy en voer de functie TakeDamage erop uit
             
             enemies[i].GetComponent<EnemyMovement>().TakeDamage(explosionDamage);
+
+            // lè explosion force
+            if (enemies[i].GetComponent<Rigidbody>()) {
+                enemies[i].GetComponent<Rigidbody>().AddExplosionForce(explosionForce, transform.position, explosionRange);
+            }
+        }
+
+        // check for players in de range van de explosion
+        Collider[] players = Physics.OverlapSphere(transform.position, explosionRange, whatIsEnemies);
+
+        for (int i = 0; i < players.Length; i++) {
+            // verkrijg de script component van de enemy en voer de functie TakeDamage erop uit
+            
+            players[i].GetComponent<PlayerMovement>().TakeDamage(explosionDamage);
+
+            // lè less stronk explosion force
+            if (players[i].GetComponent<Rigidbody>()) {
+                players[i].GetComponent<Rigidbody>().AddExplosionForce(explosionForce * 0.5f, transform.position, explosionRange);
+            }
         }
 
         // sloop de bullet wat later om bugs te voorkomen\

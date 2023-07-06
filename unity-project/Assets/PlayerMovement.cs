@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -27,11 +28,6 @@ public class PlayerMovement : MonoBehaviour
     public bool toggleCrouch;
     private float startYScale;
 
-    [Header("Gun Scale Fix")]
-    public Transform playerGunTransform;
-    public float gunCrouchZScale;
-    private float gunStartZScale;
-
     // key bindings
     [Header("Keybinds")]
     public KeyCode jumpKey = KeyCode.Space;
@@ -53,6 +49,16 @@ public class PlayerMovement : MonoBehaviour
     public float maxSpeedOnSlopeMultiplier;
     private RaycastHit slopeHit;
     private bool exitingSlope;
+
+
+    [Header("Player Stats")]
+    public int health;
+    public int maxHealth;
+    public int armor;
+    public int maxArmor;
+
+
+
 
 
     public Transform orientation;
@@ -81,11 +87,6 @@ public class PlayerMovement : MonoBehaviour
         // zorg dat de player niet omvalt (rotation freezen)
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
-
-
-        // sla de normale Yscale van de player op
-        startYScale = transform.localScale.y;
-        gunStartZScale = playerGunTransform.localScale.z;
     }
 
 
@@ -175,7 +176,7 @@ public class PlayerMovement : MonoBehaviour
                 
                 // maak de speler weer normaal
                 transform.localScale = new Vector3(transform.localScale.x, startYScale, transform.localScale.z);
-                playerGunTransform.localScale = new Vector3(playerGunTransform.localScale.x, playerGunTransform.localScale.y, gunStartZScale);
+                // playerGunTransform.localScale = new Vector3(playerGunTransform.localScale.x, playerGunTransform.localScale.y, gunStartZScale);
 
             }
             else {
@@ -184,7 +185,7 @@ public class PlayerMovement : MonoBehaviour
 
                 // maak de speler kleiner qua hoogte
                 transform.localScale = new Vector3(transform.localScale.x, crouchYScale, transform.localScale.z);
-                playerGunTransform.localScale = new Vector3(playerGunTransform.localScale.x, playerGunTransform.localScale.y, gunCrouchZScale);
+                // playerGunTransform.localScale = new Vector3(playerGunTransform.localScale.x, playerGunTransform.localScale.y, gunCrouchZScale);
                 
                 
 
@@ -344,5 +345,17 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 GetSlopeMoveDirection() {
         // hiermee wordt de move direction parallel gezet aan de slope angle
         return Vector3.ProjectOnPlane(moveDirection, slopeHit.normal).normalized;
+    }
+
+
+
+    public void TakeDamage(int damage) {
+        health -= damage;
+
+        if (health <= 0) {
+            // vul hier iets van een game over in ofzo
+            string currentSceneName = SceneManager.GetActiveScene().name;
+            SceneManager.LoadScene(currentSceneName);
+        }
     }
 }
