@@ -8,6 +8,7 @@ public class EnemyMovement : MonoBehaviour
     public NavMeshAgent agent;
     public Transform player;
     public LayerMask whatIsGround, whatIsPlayer;
+    public int health;
 
 
     // patrolling state
@@ -21,13 +22,12 @@ public class EnemyMovement : MonoBehaviour
     // attacking state
     public float timeBetweenAttacks;
     bool alreadyAttacked = false;
+    public GameObject projectile;
 
 
     // states
     public float sightRange, attackRange;
     public bool playerInSightRange, playerInAttackRange;
-
-    // dit is een github test
 
     private void Awake() {
         // vind de speler
@@ -113,7 +113,10 @@ public class EnemyMovement : MonoBehaviour
 
 
         if (!alreadyAttacked) {
-            // voeg hier nog code toe om de speler aan te vallen
+            // shoot les bullets (amazingk)
+            Rigidbody rb = Instantiate(projectile, transform.position, Quaternion.identity).GetComponent<Rigidbody>();
+            rb.AddForce(transform.forward * 32f, ForceMode.Impulse);
+
 
 
             alreadyAttacked = true;
@@ -125,4 +128,13 @@ public class EnemyMovement : MonoBehaviour
         alreadyAttacked = false;
     }
     
+
+    public void TakeDamage(int damage) {
+        health -= damage;
+        if (health <= 0) Invoke("DestroyEnemy", 0.05f);
+    }
+
+    private void DestroyEnemy() {
+        Destroy(gameObject);
+    }
 }

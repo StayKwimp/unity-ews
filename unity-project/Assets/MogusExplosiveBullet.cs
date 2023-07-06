@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Bullet : MonoBehaviour
+public class MogusExplosiveBullet : MonoBehaviour
 {
     [Header("Bullet setup")]
     public Rigidbody rb;
@@ -51,10 +51,17 @@ public class Bullet : MonoBehaviour
         for (int i = 0; i < enemies.Length; i++) {
             // verkrijg de script component van de enemy en voer de functie TakeDamage erop uit
             
-            // enemies[i].GetComponent<EnemyMovement>().TakeDamage(explosionDamage);
+            enemies[i].GetComponent<EnemyMovement>().TakeDamage(explosionDamage);
         }
+
+        // sloop de bullet wat later om bugs te voorkomen\
+        Invoke("DestroyBullet", 0.05f);
     }
 
+
+    private void DestroyBullet() {
+        Destroy(gameObject);
+    }
 
     // deze functie wordt uitgevoerd als de bullet met iets gaat colliden
     private void OnCollisionEnter(Collision collision) {
@@ -76,5 +83,13 @@ public class Bullet : MonoBehaviour
 
 
         rb.useGravity = useGravity;
+    }
+
+
+
+    // tijdelijk, laat de explosion range zien van de bullet
+    private void OnDrawGizmosSelected() {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, explosionRange);
     }
 }
