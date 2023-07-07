@@ -2629,7 +2629,7 @@ Canvas:
   serializedVersion: 3
   m_RenderMode: 1
   m_Camera: {fileID: 931010348}
-  m_PlaneDistance: 10
+  m_PlaneDistance: 5
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
   m_OverrideSorting: 0
@@ -3596,8 +3596,8 @@ MonoBehaviour:
   maxWalkPointReachTime: 240
   timeBetweenAttacks: 0.5
   projectile: {fileID: 5614272690407062716, guid: f1befd5bc9b36a74dadfda72fbb67b85, type: 3}
-  sightRange: 20
-  attackRange: 12
+  sightRange: 30
+  attackRange: 20
   playerInSightRange: 0
   playerInAttackRange: 0
 --- !u!1 &1978706520
@@ -23353,7 +23353,7 @@ MonoBehaviour:
   explosionDamage: 40
   explosionRange: 3
   explosionForce: 1200
-  maxCollisions: 10
+  maxCollisions: 4
   maxLifetime: 4
   explodeOnTouch: 1
 --- !u!96 &4301229142731566561
@@ -23808,8 +23808,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8126146448876797483}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.07, y: 0, z: 1.35}
-  m_LocalScale: {x: 0.15, y: 0.15, z: 0.15}
+  m_LocalPosition: {x: -0.18, y: 0, z: 1.35}
+  m_LocalScale: {x: 0.05, y: 0.05, z: 0.05}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -23858,7 +23858,7 @@ TrailRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 0}
+  - {fileID: 10308, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

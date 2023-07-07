@@ -76,7 +76,7 @@ public class MogusExplosiveBullet : MonoBehaviour
         }
 
         // sloop de bullet wat later om bugs te voorkomen
-        Invoke("DestroyBullet", 0.05f);
+        Invoke("DestroyBullet", 0.02f);
     }
 
 
