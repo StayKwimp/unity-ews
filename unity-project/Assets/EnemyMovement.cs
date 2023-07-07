@@ -5,6 +5,7 @@ using UnityEngine.AI;
 
 public class EnemyMovement : MonoBehaviour
 {
+    [Header("Definitions")]
     public NavMeshAgent agent;
     public Transform player;
     public LayerMask whatIsGround, whatIsPlayer;
@@ -12,6 +13,7 @@ public class EnemyMovement : MonoBehaviour
 
 
     // patrolling state
+    [Header("Patrolling State")]
     public Vector3 walkPoint;
     bool walkPointSet;
     public float walkPointRange;
@@ -20,12 +22,17 @@ public class EnemyMovement : MonoBehaviour
 
     
     // attacking state
+    [Header("Attacking State")]
     public float timeBetweenAttacks;
-    bool alreadyAttacked = false;
+    private bool alreadyAttacked = false;
+
+    [Header("Bullets")]
     public GameObject projectile;
+    public float[] shootForceMul = {1, 1, 1};
 
 
     // states
+    [Header("Sight/Attack Range")]
     public float sightRange, attackRange;
     public bool playerInSightRange, playerInAttackRange;
 
@@ -113,9 +120,15 @@ public class EnemyMovement : MonoBehaviour
 
 
         if (!alreadyAttacked) {
-            // shoot les bullets (amazingk)
-            Rigidbody rb = Instantiate(projectile, transform.position, Quaternion.identity).GetComponent<Rigidbody>();
-            rb.AddForce(transform.forward * 32f, ForceMode.Impulse);
+            // shoot les granades (amazingk)
+            var rb = Instantiate(projectile, transform.position, Quaternion.identity).GetComponent<Rigidbody>();
+            Vector3 distanceToPlayer = new Vector3(player.position.x - transform.position.x, player.position.y - transform.position.y, player.position.z - transform.position.z);
+            Vector3 shootForce = new Vector3(distanceToPlayer.x * shootForceMul[0], 1 + distanceToPlayer.y * shootForceMul[1], distanceToPlayer.z * shootForceMul[2]);
+            //rb.AddForce(transform.forward * 32f, ForceMode.Impulse);
+
+            // Debug.Log(string.Format("shootForce:  x: {0}, y: {1}, z: {2}", shootForce.x, shootForce.y, shootForce.z));
+
+            rb.AddForce(shootForce, ForceMode.Impulse);
 
 
 
@@ -132,6 +145,8 @@ public class EnemyMovement : MonoBehaviour
     public void TakeDamage(int damage) {
         health -= damage;
         if (health <= 0) Invoke("DestroyEnemy", 0.05f);
+
+        Debug.Log("health: " + health.ToString());
     }
 
     private void DestroyEnemy() {

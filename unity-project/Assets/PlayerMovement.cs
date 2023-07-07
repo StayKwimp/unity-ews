@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -57,6 +58,9 @@ public class PlayerMovement : MonoBehaviour
     public int armor;
     public int maxArmor;
 
+    [Header("Graphics")]
+    public TextMeshProUGUI healthDisplay;
+
 
 
 
@@ -109,6 +113,10 @@ public class PlayerMovement : MonoBehaviour
             rb.drag = groundDrag;
         else
             rb.drag = 0;
+        
+
+        // update de health bar display als het bestaat
+        if (healthDisplay != null) healthDisplay.SetText(string.Format("Health: {0}", health));
     }
 
 
@@ -117,7 +125,6 @@ public class PlayerMovement : MonoBehaviour
 
         // get current movement speed
         currentSpeed = rb.velocity.magnitude;
-        //Debug.Log(currentSpeed);
     }
 
 

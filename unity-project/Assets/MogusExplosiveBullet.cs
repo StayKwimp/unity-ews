@@ -28,6 +28,8 @@ public class MogusExplosiveBullet : MonoBehaviour
     private int collisions;
     private PhysicMaterial physics_mat;
 
+    private bool alreadyExploding = false;
+
 
     private void Start() {
         Setup();
@@ -41,42 +43,65 @@ public class MogusExplosiveBullet : MonoBehaviour
         // ... of als je lifetime om is
         maxLifetime -= Time.deltaTime;
         if (maxLifetime <= 0) Explode();
+
+        // Debug.Log(string.Format("Bullet velocity: x: {0}, y: {1}, z: {2}", rb.velocity.x, rb.velocity.y, rb.velocity.z));
     }
 
     private void Explode() {
-        if (explosion != null) Instantiate(explosion, transform.position, Quaternion.identity);
+        if (!alreadyExploding) {
+            if (explosion != null) Instantiate(explosion, transform.position, Quaternion.identity);
 
 
-        // check for enemies in de range van de explosion
-        Collider[] enemies = Physics.OverlapSphere(transform.position, explosionRange, whatIsEnemies);
+            // check for enemies in de range van de explosion
+            Collider[] enemies = Physics.OverlapSphere(transform.position, explosionRange, whatIsEnemies);
 
-        for (int i = 0; i < enemies.Length; i++) {
-            // verkrijg de script component van de enemy en voer de functie TakeDamage erop uit
-            
-            enemies[i].GetComponent<EnemyMovement>().TakeDamage(explosionDamage);
+            for (int i = 0; i < enemies.Length; i++) {
+                // verkrijg de script component van de enemy en voer de functie TakeDamage erop uit
+                // Debug.Log(enemies[i].ToString());
+                
+                try {
+                    enemies[i].GetComponent<EnemyMovement>().TakeDamage(explosionDamage);
+                } catch (System.Exception error) {
+                    Debug.LogWarning(string.Format("{0} Ignoring...", error));
+                }
 
-            // lè explosion force
-            if (enemies[i].GetComponent<Rigidbody>()) {
-                enemies[i].GetComponent<Rigidbody>().AddExplosionForce(explosionForce, transform.position, explosionRange);
+                // lè explosion force (enemies hebben voor nu geen rigidbody dus dit doet momenteel niks)
+                if (enemies[i].GetComponent<Rigidbody>()) {
+                    enemies[i].GetComponent<Rigidbody>().AddExplosionForce(explosionForce, transform.position, explosionRange, explosionForce * 0.1f);
+                }
             }
-        }
 
-        // check for players in de range van de explosion
-        Collider[] players = Physics.OverlapSphere(transform.position, explosionRange, whatIsEnemies);
 
-        for (int i = 0; i < players.Length; i++) {
-            // verkrijg de script component van de player en voer de functie TakeDamage erop uit
-            
-            players[i].GetComponent<PlayerMovement>().TakeDamage(explosionDamage);
 
-            // lè less stronk explosion force
-            if (players[i].GetComponent<Rigidbody>()) {
-                players[i].GetComponent<Rigidbody>().AddExplosionForce(explosionForce * 0.5f, transform.position, explosionRange);
+
+
+
+
+            // check for players in de range van de explosion
+            Collider[] players = Physics.OverlapSphere(transform.position, explosionRange, whatIsPlayer);
+
+            for (int i = 0; i < players.Length; i++) {
+                // verkrijg de script component van de player en voer de functie TakeDamage erop uit
+                // Debug.Log(players[i].ToString());
+                
+                try {
+                    players[i].GetComponentInParent<PlayerMovement>().TakeDamage(explosionDamage);
+                } catch (System.Exception error) {
+                    Debug.LogWarning(string.Format("{0} Ignoring...", error));
+                }
+
+                
+                if (players[i].GetComponent<Rigidbody>()) {
+                    players[i].GetComponent<Rigidbody>().AddExplosionForce(explosionForce * 0.5f, transform.position, explosionRange, explosionForce * 0.1f);
+                }
             }
-        }
 
-        // sloop de bullet wat later om bugs te voorkomen
-        Invoke("DestroyBullet", 0.02f);
+
+            alreadyExploding = true;
+
+            // sloop de bullet wat later om bugs te voorkomen
+            Invoke("DestroyBullet", 0.05f);
+        }
     }
 
 
@@ -89,7 +114,9 @@ public class MogusExplosiveBullet : MonoBehaviour
         collisions++;
 
         // explode als de bullet de player raakt
-        if (collision.collider.CompareTag("Player") && explodeOnTouch) Explode();
+        if (collision.collider.CompareTag("Player") && explodeOnTouch) {
+            Explode();
+        }
     }
 
     private void Setup() {
@@ -108,7 +135,7 @@ public class MogusExplosiveBullet : MonoBehaviour
 
 
 
-    // tijdelijk, laat de explosion range zien van de bullet
+    // tijdelijk, laat de explosion range zien van de bullet als je m selecteert in unity
     private void OnDrawGizmosSelected() {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, explosionRange);
