@@ -38,6 +38,7 @@ public class PlayerMovement : MonoBehaviour
     // controle of de speler op de grond staat of niet
     [Header("Ground Check")]
     public float playerHeight;
+    public float playerWidth;
     public LayerMask whatIsGround;
     bool grounded;
 
@@ -49,6 +50,10 @@ public class PlayerMovement : MonoBehaviour
     public float maxSpeedOnSlopeMultiplier;
     private RaycastHit slopeHit;
     private bool exitingSlope;
+
+    [Header("Wall Handling")]
+    public float wall;
+    private RaycastHit wallHit;
 
 
     [Header("Player Stats")]
@@ -243,8 +248,9 @@ public class PlayerMovement : MonoBehaviour
 
 
     private void MovePlayer() {
+
         // calculate movement direction
-        moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
+        moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput + HitWall();
 
 
         // moving on a slope
@@ -319,6 +325,42 @@ public class PlayerMovement : MonoBehaviour
         readyToJump = true;
 
         exitingSlope = false;
+    }
+
+
+    private Vector3 HitWall(){
+
+        Vector3 highPosition = new Vector3 (transform.position.x, transform.position.y - 0.9f, transform.position.z);
+        Vector3 lowPosition = new Vector3 (transform.position.x, transform.position.y + 0.9f, transform.position.z);
+
+        Vector3 vectorDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
+
+        if(Physics.Raycast(transform.position, vectorDirection, out wallHit, playerWidth * 0.5f)) {
+
+            wall = 1;
+            Debug.Log(wallHit.normal);
+            return wallHit.normal;
+
+        }
+        else if(Physics.Raycast(highPosition, vectorDirection, out wallHit, playerWidth * 0.5f)) {
+
+            wall = 1;
+            Debug.Log(wallHit.normal);
+            return wallHit.normal;
+
+        }
+        else if(Physics.Raycast(lowPosition, vectorDirection, out wallHit, playerWidth * 0.5f)) {
+
+            wall = 1;
+            Debug.Log(wallHit.normal);
+            return wallHit.normal;
+            
+
+        }
+        else{
+            wall = 0;
+            return Vector3.zero;
+        }
     }
 
 
