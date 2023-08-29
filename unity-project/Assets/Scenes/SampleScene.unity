@@ -954,7 +954,7 @@ Transform:
   m_GameObject: {fileID: 432584052}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 19.557558, y: 3.6, z: -19.132645}
-  m_LocalScale: {x: 5, y: 1, z: 5}
+  m_LocalScale: {x: 5, y: 1, z: 25}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2111567079}
@@ -1424,7 +1424,7 @@ MonoBehaviour:
   sprintKey: 304
   crouchKey: 120
   playerHeight: 2
-  playerWidth: 0
+  playerWidth: 1
   whatIsGround:
     serializedVersion: 2
     m_Bits: 64

@@ -53,7 +53,6 @@ public class PlayerMovement : MonoBehaviour
     private bool exitingSlope;
 
     [Header("Wall Handling")]
-    public float wall;
     private RaycastHit wallHit;
 
 
@@ -257,7 +256,9 @@ public class PlayerMovement : MonoBehaviour
     private void MovePlayer() {
 
         // calculate movement direction
-        moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput + HitWall();
+        moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
+        Vector3 moveDirectionNormalized = moveDirection.normalized + HitWall();
+        Debug.Log("moveDirection: " + moveDirection.ToString() + ", normalised: " + moveDirectionNormalized.ToString());
 
 
         // moving on a slope
@@ -282,11 +283,11 @@ public class PlayerMovement : MonoBehaviour
 
         if (grounded) {
             // forcemode.force zorgt ervoor dat de kracht de hele tijd toegepast kan worden
-            rb.AddForce(moveDirection.normalized * mvSpeed * 10f, ForceMode.Force);
+            rb.AddForce(moveDirectionNormalized * mvSpeed * 10f, ForceMode.Force);
         } else {
             // in de lucht worden krachten met airMultiplier vermenigvuldigd, wat ervoor kan
             // zorgen dat je langzamer je direction kan aanpassen (als airMultiplier < 1)
-            rb.AddForce(moveDirection.normalized * mvSpeed * 10f * airMultiplier, ForceMode.Force);
+            rb.AddForce(moveDirectionNormalized * mvSpeed * 10f * airMultiplier, ForceMode.Force);
         }
     }
 
@@ -337,37 +338,37 @@ public class PlayerMovement : MonoBehaviour
 
     private Vector3 HitWall(){
 
-        Vector3 highPosition = new Vector3 (transform.position.x, transform.position.y - 0.9f, transform.position.z);
-        Vector3 lowPosition = new Vector3 (transform.position.x, transform.position.y + 0.9f, transform.position.z);
+        Vector3 highPosition = new Vector3 (transform.position.x, transform.position.y - playerHeight * 0.5f, transform.position.z);
+        Vector3 lowPosition = new Vector3 (transform.position.x, transform.position.y + playerHeight * 0.5f, transform.position.z);
 
         Vector3 vectorDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
 
-        if(Physics.Raycast(transform.position, vectorDirection, out wallHit, playerWidth * 0.5f)) {
+        Vector3 moveStop = Vector3.zero;
 
-            wall = 1;
-            Debug.Log(wallHit.normal);
-            return wallHit.normal;
 
-        }
-        else if(Physics.Raycast(highPosition, vectorDirection, out wallHit, playerWidth * 0.5f)) {
 
-            wall = 1;
-            Debug.Log(wallHit.normal);
-            return wallHit.normal;
 
-        }
-        else if(Physics.Raycast(lowPosition, vectorDirection, out wallHit, playerWidth * 0.5f)) {
+        moveStop = WallRaycast(transform.position, highPosition, lowPosition, vectorDirection, playerWidth * 0.5f);
 
-            wall = 1;
-            Debug.Log(wallHit.normal);
-            return wallHit.normal;
+        Debug.Log(moveStop);
             
+        return moveStop;
+        
+    }
 
+
+
+    private Vector3 WallRaycast(Vector3 pos, Vector3 posHigh, Vector3 posLow, Vector3 direction, float raycastLength) {
+        if (Physics.Raycast(pos, direction, out wallHit, raycastLength)) {
+            return wallHit.normal;
         }
-        else{
-            wall = 0;
-            return Vector3.zero;
+        if (Physics.Raycast(posHigh, direction, out wallHit, raycastLength)) {
+            return wallHit.normal;
         }
+        if (Physics.Raycast(posLow, direction, out wallHit, raycastLength)) {
+            return wallHit.normal;
+        }
+        return Vector3.zero;
     }
 
 
