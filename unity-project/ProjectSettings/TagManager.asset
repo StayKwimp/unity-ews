@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Enemy
   - MuzzleFlash
+  - Wall
   layers:
   - Default
   - TransparentFX

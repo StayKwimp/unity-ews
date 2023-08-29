@@ -54,6 +54,7 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Wall Handling")]
     private RaycastHit wallHit;
+    private Vector3 wallVector = Vector3.zero;
 
 
     [Header("Player Stats")]
@@ -253,12 +254,22 @@ public class PlayerMovement : MonoBehaviour
 
 
 
+
+
     private void MovePlayer() {
 
         // calculate movement direction
         moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
-        Vector3 moveDirectionNormalized = moveDirection.normalized + HitWall();
-        Debug.Log("moveDirection: " + moveDirection.ToString() + ", normalised: " + moveDirectionNormalized.ToString());
+        Debug.Log(wallVector);
+        Vector3 moveDirectionNormalized = moveDirection.normalized + wallVector;
+
+
+        
+        
+
+        Debug.Log("moveDirection: " + moveDirection.ToString() + ", normalised: " + moveDirection.normalized.ToString() + ", result: " + moveDirectionNormalized.ToString());
+
+        wallVector = Vector3.zero;
 
 
         // moving on a slope
@@ -336,24 +347,23 @@ public class PlayerMovement : MonoBehaviour
     }
 
 
-    private Vector3 HitWall(){
+    private void HitWall(){
 
         Vector3 highPosition = new Vector3 (transform.position.x, transform.position.y - playerHeight * 0.5f, transform.position.z);
         Vector3 lowPosition = new Vector3 (transform.position.x, transform.position.y + playerHeight * 0.5f, transform.position.z);
 
         Vector3 vectorDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
 
-        Vector3 moveStop = Vector3.zero;
-
-
-
-
-        moveStop = WallRaycast(transform.position, highPosition, lowPosition, vectorDirection, playerWidth * 0.5f);
-
-        Debug.Log(moveStop);
-            
-        return moveStop;
         
+
+
+
+
+
+
+        wallVector = WallRaycast(transform.position, highPosition, lowPosition, vectorDirection, playerWidth * 0.51f);
+        
+        Debug.Log(wallVector);
     }
 
 
@@ -373,6 +383,42 @@ public class PlayerMovement : MonoBehaviour
 
 
 
+    public void OnCollisionStay(Collision collision) {
+        // als de collider de tag Wall heeft
+        if (collision.collider.CompareTag("Wall")) {
+            // get surface of collider with a raycast
+
+            Transform wallTransform = collision.transform;
+            Vector3 raycastDirection = new Vector3(wallTransform.position.x - transform.position.x, 0f, wallTransform.position.z - transform.position.z);
+
+
+            Physics.Raycast(transform.position, raycastDirection, out wallHit, raycastDirection.magnitude);
+            wallVector = wallHit.normal;
+            wallVector.y = 0f;
+            
+
+
+            // als de raycast de boven of onderkant van het object raakt, dan is wallVector nul dus dan moet de origin van de raycast
+            // naar beneden of boven om te zorgen dat het de zijkant raakt
+            float playerHeightMul = -0.5f;
+
+            while (wallVector == Vector3.zero) {
+
+                Vector3 rayStartPos = new Vector3(transform.position.x, transform.position.y - playerHeight * playerHeightMul, transform.position.z);
+                raycastDirection = new Vector3(wallTransform.position.x - rayStartPos.x, 0f, wallTransform.position.z - rayStartPos.z);
+                
+
+                Physics.Raycast(rayStartPos, raycastDirection, out wallHit, raycastDirection.magnitude);
+                wallVector = wallHit.normal;
+                wallVector.y = 0f;
+
+                playerHeightMul += 0.1f;
+                // zorg dat het spel niet vast loopt lol
+                if (playerHeightMul > 0.5f) break;
+            }
+
+        }
+    }
 
 
 
