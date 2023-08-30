@@ -36,6 +36,14 @@ public class EnemyMovement : MonoBehaviour
     public float sightRange, attackRange;
     public bool playerInSightRange, playerInAttackRange;
 
+    [Header("Reticle Coloring")]
+    public GameObject reticleGameObject;
+
+
+    [Header("Sound")]
+    public GameObject audioManager;
+    
+
     private void Awake() {
         // vind de speler
         player = GameObject.Find("PlayerObj").transform;
@@ -147,9 +155,12 @@ public class EnemyMovement : MonoBehaviour
         if (health <= 0) Invoke("DestroyEnemy", 0.05f);
 
         Debug.Log("health: " + health.ToString());
+        audioManager.GetComponent<AudioManager>().Play("bullet hit");
     }
 
     private void DestroyEnemy() {
         Destroy(gameObject);
+
+        reticleGameObject.GetComponent<ReticleColor>().FlashReticleColor();
     }
 }

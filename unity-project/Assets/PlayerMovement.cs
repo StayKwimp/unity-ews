@@ -260,14 +260,25 @@ public class PlayerMovement : MonoBehaviour
 
         // calculate movement direction
         moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
-        Debug.Log(wallVector);
-        Vector3 moveDirectionNormalized = moveDirection.normalized + wallVector;
+        //Debug.Log(wallVector);
+        
+        Vector3 moveDirectionNormalized = Vector3.zero;
+
+        if (Mathf.Abs(wallVector.x) > Mathf.Abs(moveDirection.normalized.x)) moveDirectionNormalized.x = 0f;
+        else moveDirectionNormalized.x = moveDirection.normalized.x + wallVector.x;
+
+        if (Mathf.Abs(wallVector.z) > Mathf.Abs(moveDirection.normalized.z)) moveDirectionNormalized.z = 0f;
+        else moveDirectionNormalized.z = moveDirection.normalized.z + wallVector.z;
+        
+        moveDirectionNormalized.y = moveDirection.normalized.y + wallVector.y;
 
 
         
+        if (Mathf.Sign(moveDirection.normalized.x) == Mathf.Sign(wallVector.x)) moveDirectionNormalized.x = moveDirection.normalized.x;
+        if (Mathf.Sign(moveDirection.normalized.z) == Mathf.Sign(wallVector.z)) moveDirectionNormalized.z = moveDirection.normalized.z;
         
 
-        Debug.Log("moveDirection: " + moveDirection.ToString() + ", normalised: " + moveDirection.normalized.ToString() + ", result: " + moveDirectionNormalized.ToString());
+        //Debug.Log("moveDirection: " + moveDirection.ToString() + ", normalised: " + moveDirection.normalized.ToString() + ", result: " + moveDirectionNormalized.ToString());
 
         wallVector = Vector3.zero;
 
@@ -344,41 +355,6 @@ public class PlayerMovement : MonoBehaviour
         readyToJump = true;
 
         exitingSlope = false;
-    }
-
-
-    private void HitWall(){
-
-        Vector3 highPosition = new Vector3 (transform.position.x, transform.position.y - playerHeight * 0.5f, transform.position.z);
-        Vector3 lowPosition = new Vector3 (transform.position.x, transform.position.y + playerHeight * 0.5f, transform.position.z);
-
-        Vector3 vectorDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
-
-        
-
-
-
-
-
-
-        wallVector = WallRaycast(transform.position, highPosition, lowPosition, vectorDirection, playerWidth * 0.51f);
-        
-        Debug.Log(wallVector);
-    }
-
-
-
-    private Vector3 WallRaycast(Vector3 pos, Vector3 posHigh, Vector3 posLow, Vector3 direction, float raycastLength) {
-        if (Physics.Raycast(pos, direction, out wallHit, raycastLength)) {
-            return wallHit.normal;
-        }
-        if (Physics.Raycast(posHigh, direction, out wallHit, raycastLength)) {
-            return wallHit.normal;
-        }
-        if (Physics.Raycast(posLow, direction, out wallHit, raycastLength)) {
-            return wallHit.normal;
-        }
-        return Vector3.zero;
     }
 
 

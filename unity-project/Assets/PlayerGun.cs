@@ -43,6 +43,10 @@ public class PlayerGun : MonoBehaviour
     public KeyCode reloadKey;
 
 
+    [Header("Sounds")]
+    public GameObject audioManager;
+
+
 
     // bugfixing (holie shid)
     public bool allowInvoke = true;
@@ -59,7 +63,10 @@ public class PlayerGun : MonoBehaviour
         MyInput();
 
         // set ammo display if it exists
-        if (ammoDisplay != null) ammoDisplay.SetText(bulletsLeft / bulletsPerTap + " / " + magazineSize / bulletsPerTap);
+        if (ammoDisplay != null) {
+            if (!reloading) ammoDisplay.SetText(bulletsLeft / bulletsPerTap + " / " + magazineSize / bulletsPerTap);
+            else ammoDisplay.SetText("Reloading!");
+        }
     }
 
 
@@ -141,6 +148,9 @@ public class PlayerGun : MonoBehaviour
         bulletsLeft--;
         bulletsShot++;
 
+        // speel geluid af
+        PlaySound("AK fire");
+
 
         // invoke de resetShot functie (als dat al niet gebeurd is)
         if (allowInvoke) {
@@ -154,6 +164,10 @@ public class PlayerGun : MonoBehaviour
     }
 
 
+    public void PlaySound(string name) {
+        audioManager.GetComponent<AudioManager>().Play(name);
+    }
+
     private void ResetShot() {
         // allow shooting and invoking again
         readyToShoot = true;
@@ -162,6 +176,9 @@ public class PlayerGun : MonoBehaviour
 
     private void Reload() {
         reloading = true;
+
+        // speel geluid af
+        PlaySound("AK reload");
         Invoke("ReloadFinished", reloadTime);
     }
 
