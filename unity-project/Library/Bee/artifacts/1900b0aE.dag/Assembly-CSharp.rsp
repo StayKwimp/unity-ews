@@ -360,6 +360,7 @@
 "Assets/ReticleColor.cs"
 "Assets/SFX/AudioManager.cs"
 "Assets/SFX/Sound.cs"
+"Assets/SwitchRoom.cs"
 "Assets/UnityTechnologies/ParticlePack/Shared/Ramps/Runtime/RampAsset.cs"
 "Assets/UnityTechnologies/ParticlePack/Shared/Scripts/AdjustTimeScale.cs"
 "Assets/UnityTechnologies/ParticlePack/Shared/Scripts/ProximityActivate.cs"
