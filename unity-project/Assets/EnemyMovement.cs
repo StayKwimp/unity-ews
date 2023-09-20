@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using static EnemyMovement;
+
 
 public class EnemyMovement : MonoBehaviour
 {
@@ -29,6 +31,9 @@ public class EnemyMovement : MonoBehaviour
     [Header("Bullets")]
     public GameObject projectile;
     public float[] shootForceMul = {1, 1, 1};
+    public Vector3 bulletOrigin = new Vector3(0, 0, 0); 
+    public Vector3 targetingPoint = new Vector3(0, 0, 0); // de y component moet negatief zijn als je wil dat hij omhoog richt en positief als je wil dat hij naar beneden richt.
+
 
 
     // states
@@ -129,14 +134,20 @@ public class EnemyMovement : MonoBehaviour
 
         if (!alreadyAttacked) {
             // shoot les granades (amazingk)
-            var rb = Instantiate(projectile, transform.position, Quaternion.identity).GetComponent<Rigidbody>();
-            Vector3 distanceToPlayer = new Vector3(player.position.x - transform.position.x, player.position.y - transform.position.y, player.position.z - transform.position.z);
-            Vector3 shootForce = new Vector3(distanceToPlayer.x * shootForceMul[0], 1 + distanceToPlayer.y * shootForceMul[1], distanceToPlayer.z * shootForceMul[2]);
+            //hier wordt transform.TransformDirection gebruikt om de positie van de bulletOrigin relatief ten op zichte van de enemy te houden
+            Vector3 bulletOriginPosition = transform.position + transform.TransformDirection(bulletOrigin);
+
+            var rb = Instantiate(projectile, bulletOriginPosition, transform.rotation).GetComponent<Rigidbody>();
+            Vector3 distanceToPlayer = new Vector3(player.position.x - bulletOriginPosition.x, player.position.y - bulletOriginPosition.y, player.position.z - bulletOriginPosition.z);
+            Vector3 shootForce = new Vector3(distanceToPlayer.x * shootForceMul[0], distanceToPlayer.y * shootForceMul[1], distanceToPlayer.z * shootForceMul[2]);
             //rb.AddForce(transform.forward * 32f, ForceMode.Impulse);
 
             // Debug.Log(string.Format("shootForce:  x: {0}, y: {1}, z: {2}", shootForce.x, shootForce.y, shootForce.z));
 
-            rb.AddForce(shootForce, ForceMode.Impulse);
+
+            //hier wordt transform.TransformDirection gebruikt om de vector relatief ten op zichte van de shootForce vector te houden
+            rb.AddForce(shootForce - transform.TransformDirection(targetingPoint), ForceMode.Impulse);
+
 
 
 

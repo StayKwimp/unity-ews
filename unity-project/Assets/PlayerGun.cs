@@ -165,7 +165,8 @@ public class PlayerGun : MonoBehaviour
 
 
     public void PlaySound(string name) {
-        audioManager.GetComponent<AudioManager>().Play(name);
+        // geluid werkt nog niet, i dunno why
+        //audioManager.GetComponent<AudioManager>().Play(name);
     }
 
     private void ResetShot() {
