@@ -26,20 +26,32 @@ public class EnemyMovement : MonoBehaviour
     // attacking state
     [Header("Attacking State")]
     public float timeBetweenAttacks;
+    public enum Weapon {Bullets, Grenades};
+    public Weapon attackType;
     private bool alreadyAttacked = false;
 
-    [Header("Bullets")]
+    [Header("Grenades/Bullets")]
     public GameObject projectile;
     public float[] shootForceMul = {1, 1, 1};
-    public Vector3 bulletOrigin = new Vector3(0, 0, 0); 
-    public Vector3 targetingPoint = new Vector3(0, 0, 0); // de y component moet negatief zijn als je wil dat hij omhoog richt en positief als je wil dat hij naar beneden richt.
+    public Transform bulletSpawnpoint;
+    public Vector3 targetingPointOffset; // de y component moet negatief zijn als je wil dat hij omhoog richt en positief als je wil dat hij naar beneden richt.
 
+    private Vector3 bulletOrigin;
+
+    [Header("Bullets")]
+    public float spread; 
+    public float bulletShootForceMul;
+    public float[] playerMovementAdjustment = {1, 1};
+    public GameObject muzzleFlash;
+    public float bulletMaxTime;
 
 
     // states
     [Header("Sight/Attack Range")]
+    public float leaveAttackingStateRange;
     public float sightRange, attackRange;
-    public bool playerInSightRange, playerInAttackRange;
+    public bool playerInSightRange, playerInAttackRange, playerInLeaveAttackRange;
+    private bool attacking = false;
 
     [Header("Reticle Coloring")]
     public GameObject reticleGameObject;
@@ -59,15 +71,28 @@ public class EnemyMovement : MonoBehaviour
     void Update()
     {
         // check of de speler in de sight en attack range is
+        playerInLeaveAttackRange = Physics.CheckSphere(transform.position, leaveAttackingStateRange, whatIsPlayer);
         playerInSightRange = Physics.CheckSphere(transform.position, sightRange, whatIsPlayer);
         playerInAttackRange = Physics.CheckSphere(transform.position, attackRange, whatIsPlayer);
 
-        if (!playerInSightRange && !playerInAttackRange) Patrolling();
-        if (playerInSightRange && !playerInAttackRange) ChasePlayer();
-        if (playerInAttackRange && playerInSightRange) AttackPlayer();
+        // Debug.Log($"playerInSightRange: {playerInSightRange}, playerInAttackRange: {playerInAttackRange}, playerInLeaveAttackRange: {playerInLeaveAttackRange}, attacking: {attacking}");
 
 
-        //Debug.Log(string.Format("PlayerInSightRange: {0}, PlayerInAttackRange: {1}", playerInSightRange, playerInAttackRange));
+        if (attacking) {
+            attacking = playerInLeaveAttackRange;
+        }
+
+        if (!playerInSightRange) {
+            Patrolling();
+            attacking = false;
+        }
+        else if (!playerInAttackRange && !playerInLeaveAttackRange) ChasePlayer();
+
+        if ((playerInAttackRange && playerInSightRange) || attacking) {
+            AttackPlayer();
+            attacking = true;
+        }
+        
     }
 
 
@@ -120,6 +145,10 @@ public class EnemyMovement : MonoBehaviour
     }
 
 
+
+
+
+
     private void AttackPlayer() {
         // zorg dat de enemy niet gaat gebewegen door de destination op zijn current position te zetten
         agent.SetDestination(transform.position);
@@ -133,28 +162,93 @@ public class EnemyMovement : MonoBehaviour
 
 
         if (!alreadyAttacked) {
-            // shoot les granades (amazingk)
-            //hier wordt transform.TransformDirection gebruikt om de positie van de bulletOrigin relatief ten op zichte van de enemy te houden
-            Vector3 bulletOriginPosition = transform.position + transform.TransformDirection(bulletOrigin);
-
-            var rb = Instantiate(projectile, bulletOriginPosition, transform.rotation).GetComponent<Rigidbody>();
-            Vector3 distanceToPlayer = new Vector3(player.position.x - bulletOriginPosition.x, player.position.y - bulletOriginPosition.y, player.position.z - bulletOriginPosition.z);
-            Vector3 shootForce = new Vector3(distanceToPlayer.x * shootForceMul[0], distanceToPlayer.y * shootForceMul[1], distanceToPlayer.z * shootForceMul[2]);
-            //rb.AddForce(transform.forward * 32f, ForceMode.Impulse);
-
-            // Debug.Log(string.Format("shootForce:  x: {0}, y: {1}, z: {2}", shootForce.x, shootForce.y, shootForce.z));
+            bulletOrigin = bulletSpawnpoint.position;
 
 
-            //hier wordt transform.TransformDirection gebruikt om de vector relatief ten op zichte van de shootForce vector te houden
-            rb.AddForce(shootForce - transform.TransformDirection(targetingPoint), ForceMode.Impulse);
-
-
-
+            if (attackType == Weapon.Grenades) AttackPlayerWithGrenade();
+            else if (attackType == Weapon.Bullets) AttackPlayerWithBullet();
 
             alreadyAttacked = true;
             Invoke(nameof(ResetAttack), timeBetweenAttacks);
         }
     }
+
+
+    private void AttackPlayerWithGrenade() {
+        
+        // shoot les granades (amazingk)
+        //hier wordt transform.TransformDirection gebruikt om de positie van de bulletOrigin relatief ten op zichte van de enemy te houden
+        // Vector3 bulletOriginPosition = transform.position + transform.TransformDirection(bulletOrigin);
+
+        var rb = Instantiate(projectile, bulletOrigin, transform.rotation).GetComponent<Rigidbody>();
+        Vector3 distanceToPlayer = player.position - bulletOrigin;
+        Vector3 shootForce = new Vector3(distanceToPlayer.x * shootForceMul[0], distanceToPlayer.y * shootForceMul[1], distanceToPlayer.z * shootForceMul[2]);
+
+
+
+        //hier wordt transform.TransformDirection gebruikt om de vector relatief ten op zichte van de shootForce vector te houden
+        rb.AddForce(shootForce - transform.TransformDirection(targetingPointOffset), ForceMode.Impulse);        
+    }
+
+
+
+    private void AttackPlayerWithBullet() {
+        // eerst de player velocity bepalen, en dan nog de movement van de player voorspellen en die erbij doen
+
+        var playerVelocity = player.GetComponentInParent<Rigidbody>().velocity;
+        var distanceToPlayer = player.position - bulletOrigin;
+        
+        // 
+        var multiplierXZ = distanceToPlayer.magnitude * playerMovementAdjustment[0];
+        var multiplierY = distanceToPlayer.magnitude * playerMovementAdjustment[1];
+
+        Debug.Log(distanceToPlayer.magnitude);
+        
+        var aimingPosition = player.position + targetingPointOffset + new Vector3(playerVelocity.x * multiplierXZ, playerVelocity.y * multiplierY, playerVelocity.z * multiplierXZ);
+        // var aimingPosition = player.position + targetingPointOffset + new Vector3(playerVelocity.x * playerMovementAdjustment[0], playerVelocity.y * playerMovementAdjustment[1], playerVelocity.z * playerMovementAdjustment[0]);
+
+        // vector AB = position B - position A
+        Vector3 directionWithoutSpread = aimingPosition - bulletOrigin;
+
+
+        Debug.DrawLine(bulletOrigin, aimingPosition, Color.green, 2f);
+
+        
+
+        // bullet spread toevoegen
+        float xSpread = Random.Range(-spread, spread);
+        float ySpread = Random.Range(-spread, spread);
+
+
+        Vector3 directionWithSpread = directionWithoutSpread + new Vector3(xSpread, ySpread, 0f);
+
+
+        // bullet spawnen
+        GameObject currentBullet = Instantiate(projectile, bulletOrigin, Quaternion.identity);
+        
+        // draai de bullet
+        currentBullet.transform.forward = directionWithSpread.normalized;
+
+        // zorg dat de bullet daadwerkelijk ergens heen vliegt
+        currentBullet.GetComponent<Rigidbody>().AddForce(directionWithSpread.normalized * bulletShootForceMul, ForceMode.Impulse);
+
+
+        // muzzle flash
+        if (muzzleFlash != null) {
+            Instantiate(muzzleFlash, bulletOrigin, Quaternion.identity);
+        }
+
+
+
+        alreadyAttacked = true;
+        Invoke(nameof(ResetAttack), timeBetweenAttacks);
+    }
+
+
+
+
+
+
 
     private void ResetAttack() {
         alreadyAttacked = false;

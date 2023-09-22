@@ -123,7 +123,6 @@ public class PlayerGun : MonoBehaviour
 
 
         // spawn lè bullet au your mom
-        // currentBullet is hier ook gelijk een pointer naar de gespawnde bullet
         GameObject currentBullet = Instantiate(bullet, attackPoint.position, Quaternion.identity);
 
         // rotate de bullet
@@ -165,8 +164,8 @@ public class PlayerGun : MonoBehaviour
 
 
     public void PlaySound(string name) {
-        // geluid werkt nog niet, i dunno why
-        //audioManager.GetComponent<AudioManager>().Play(name);
+        Debug.Log($"Play sound: {name}");
+        audioManager.GetComponent<AudioManager>().Play(name);
     }
 
     private void ResetShot() {

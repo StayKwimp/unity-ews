@@ -164,11 +164,12 @@ MonoBehaviour:
   - 1
   bulletOrigin: {x: 0, y: 0, z: 0}
   targetingPoint: {x: 0, y: 0, z: 0}
-  y_targetingPoint: 1.6
   sightRange: 35
   attackRange: 20
   playerInSightRange: 0
   playerInAttackRange: 0
+  reticleGameObject: {fileID: 7712997047275108888, guid: 7dd4575f6c92eb7479b83e5c264ae17e, type: 3}
+  audioManager: {fileID: 852120296705119213, guid: 6efa428e0940f274c8a371496743bf08, type: 3}
 --- !u!195 &4976015203116000043
 NavMeshAgent:
   m_ObjectHideFlags: 0

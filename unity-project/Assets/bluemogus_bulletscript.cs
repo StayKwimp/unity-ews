@@ -8,39 +8,48 @@ public class bluemogus_bulletscript : MonoBehaviour
     [Header("Bullet setup")]
     public LayerMask whatIsEnemies;
     public LayerMask whatIsBullet;
+    public LayerMask whatIsPlayer;
 
     [Header("Bullet stats")]
     public int bulletDamage;
     public float bulletLifetime;
 
+    private float raycastLength = 1f;
 
 
-    // Start is called before the first frame update
-    void Start()
-    {
+    // called on a fixed interval
+    void FixedUpdate() {
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, transform.forward, out hit, raycastLength, whatIsPlayer)) {
+            hit.transform.gameObject.GetComponentInParent<PlayerMovement>().TakeDamage(bulletDamage);
+
+            Invoke(nameof(DestroyBullet), 0.05f);
+        }
+
     }
 
-    // Update is called once per frame
+
     void Update()
     {
         bulletLifetime -= Time.deltaTime;
         if(bulletLifetime <= 0){
-            Destroy(gameObject);
+            Invoke(nameof(DestroyBullet), 0.05f);
         }
         
     }
 
 
-private void OnCollisionEnter(Collision collision) {
+    private void OnCollisionEnter(Collision collision) {
 
-    if (collision.collider.CompareTag("Player")) {
-        collision.gameObject.GetComponentInParent<PlayerMovement>().TakeDamage(bulletDamage);
-        }
+        // if (collision.collider.CompareTag("Player")) {
+        //     collision.gameObject.GetComponentInParent<PlayerMovement>().TakeDamage(bulletDamage);
+        // }
 
- Destroy(gameObject);
+        Invoke(nameof(DestroyBullet), 0.05f);
+    }
 
-
-}
-
-
+    private void DestroyBullet() {
+        // dit om bugs te voorkomen
+        Destroy(gameObject);
+    }
 }

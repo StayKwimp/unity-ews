@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 4995127830615243438}
   - component: {fileID: 4995127830615243429}
   - component: {fileID: 4995127830615243428}
-  m_Layer: 10
+  m_Layer: 14
   m_Name: MogusExplosiveBullet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
