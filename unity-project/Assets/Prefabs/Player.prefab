@@ -251,6 +251,8 @@ MonoBehaviour:
   maxHealth: 200
   armor: 0
   maxArmor: 100
+  healCooldownTime: 4
+  healSpeed: 1
   healthDisplay: {fileID: 0}
   orientation: {fileID: 3240804980691488365}
   state: 0

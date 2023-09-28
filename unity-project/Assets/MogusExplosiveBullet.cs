@@ -62,7 +62,7 @@ public class MogusExplosiveBullet : MonoBehaviour
                 try {
                     enemies[i].GetComponent<EnemyMovement>().TakeDamage(explosionDamage);
                 } catch (System.Exception error) {
-                    Debug.LogWarning(string.Format("{0} Ignoring...", error));
+                    Debug.LogWarning(string.Format("{0} Affected enemy inside explosion range didn't take any damage. Ignoring...", error));
                 }
 
                 // lè explosion force (enemies hebben voor nu geen rigidbody dus dit doet momenteel niks)

@@ -62,6 +62,10 @@ public class PlayerMovement : MonoBehaviour
     public int maxHealth;
     public int armor;
     public int maxArmor;
+    public float healCooldownTime;
+    public int healthPerSecond;
+    private float healthBuffer;
+    private float secondsPastTakingDamage;
 
     [Header("Graphics")]
     public TextMeshProUGUI healthDisplay;
@@ -112,6 +116,7 @@ public class PlayerMovement : MonoBehaviour
         MyInput();
         SpeedControl();
         StateHandler();
+        HealPlayer();
 
         // zorg dat de drag nul is als de player niet op de grond staat
         if (grounded)
@@ -124,6 +129,31 @@ public class PlayerMovement : MonoBehaviour
         if (healthDisplay != null) healthDisplay.SetText(string.Format("Health: {0}", health));
     }
 
+
+
+    private void HealPlayer() {
+        // heal de player na zoveel seconden geen damage genomen te hebben
+        // secondsPastTakingDamage wordt gereset in DamagePlayer()
+        secondsPastTakingDamage += Time.deltaTime;
+
+        if (secondsPastTakingDamage >= healCooldownTime) {
+            // we gebruiken hier een health buffer, want health is een integer en je wilt hier een float hebben als buffer (anders heal je te snel)
+            healthBuffer += healthPerSecond * Time.deltaTime;
+
+            // voeg health toe als de buffer groter is dan 1
+            if (healthBuffer >= 1f) {
+                var healthIncrease = (int)healthBuffer;
+                // (int) rondt altijd naar beneden af
+                health += healthIncrease;
+
+                healthBuffer -= healthIncrease;
+            }
+            
+
+            // zorg dat de player niet meer health kan healen dan de max
+            if (health > maxHealth) health = maxHealth;
+        }
+    }
 
     private void FixedUpdate() {
         MovePlayer();
@@ -238,8 +268,12 @@ public class PlayerMovement : MonoBehaviour
         }
 
 
-        // als je uiteindelijk niet op de grond staat, switch dan naar de air state
+        // als je uiteindelijk niet op de grond staat, switch dan naar de air state (en stop met crouchen)
         else if (!grounded) {
+            if (state == movementState.crouching) {
+                // undo de crouch
+                transform.localScale = new Vector3(transform.localScale.x, startYScale, transform.localScale.z);
+            }
             state = movementState.air;
         }
 
@@ -426,6 +460,7 @@ public class PlayerMovement : MonoBehaviour
 
     public void TakeDamage(int damage) {
         health -= damage;
+        secondsPastTakingDamage = 0f;
 
         if (health <= 0) {
             // vul hier iets van een game over in ofzo

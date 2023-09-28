@@ -182,7 +182,7 @@ public class EnemyMovement : MonoBehaviour
 
         var rb = Instantiate(projectile, bulletOrigin, transform.rotation).GetComponent<Rigidbody>();
         Vector3 distanceToPlayer = player.position - bulletOrigin;
-        Vector3 shootForce = new Vector3(distanceToPlayer.x * shootForceMul[0], distanceToPlayer.y * shootForceMul[1], distanceToPlayer.z * shootForceMul[2]);
+        Vector3 shootForce = new Vector3(distanceToPlayer.x * shootForceMul[0], distanceToPlayer.y * shootForceMul[1] + 5f, distanceToPlayer.z * shootForceMul[2]);
 
 
 
@@ -198,11 +198,11 @@ public class EnemyMovement : MonoBehaviour
         var playerVelocity = player.GetComponentInParent<Rigidbody>().velocity;
         var distanceToPlayer = player.position - bulletOrigin;
         
-        // 
+        // afstand maal een constante wordt de aiming position (een rare vorm van pythagoras i guess)
         var multiplierXZ = distanceToPlayer.magnitude * playerMovementAdjustment[0];
         var multiplierY = distanceToPlayer.magnitude * playerMovementAdjustment[1];
 
-        Debug.Log(distanceToPlayer.magnitude);
+        // Debug.Log(distanceToPlayer.magnitude);
         
         var aimingPosition = player.position + targetingPointOffset + new Vector3(playerVelocity.x * multiplierXZ, playerVelocity.y * multiplierY, playerVelocity.z * multiplierXZ);
         // var aimingPosition = player.position + targetingPointOffset + new Vector3(playerVelocity.x * playerMovementAdjustment[0], playerVelocity.y * playerMovementAdjustment[1], playerVelocity.z * playerMovementAdjustment[0]);
@@ -259,8 +259,11 @@ public class EnemyMovement : MonoBehaviour
         health -= damage;
         if (health <= 0) Invoke("DestroyEnemy", 0.05f);
 
-        Debug.Log("health: " + health.ToString());
-        audioManager.GetComponent<AudioManager>().Play("bullet hit");
+        // Debug.Log("health: " + health.ToString());
+
+        
+        // werkt nog niet, te lui (en momenteel te insignificant) om te fixen :)
+        // audioManager.GetComponent<AudioManager>().Play("bullet hit");
     }
 
     private void DestroyEnemy() {

@@ -6,7 +6,6 @@ public class ReticleColor : MonoBehaviour
 {
 
     [Header("Reticle Coloring")]
-    public GameObject reticle;
     public float reticleColorChangeTime;
     public Color baseReticleColor;
     public Color reticleColorUponDeath;
@@ -16,15 +15,15 @@ public class ReticleColor : MonoBehaviour
     
     public void Start()
     {
-        reticle.GetComponent<SpriteRenderer>().color = baseReticleColor;
+        gameObject.GetComponent<SpriteRenderer>().color = baseReticleColor;
     }
 
     public void FlashReticleColor() {
-        reticle.GetComponent<SpriteRenderer>().color = reticleColorUponDeath;
+        gameObject.GetComponent<SpriteRenderer>().color = Color.red;
         Invoke(nameof(ResetReticleColor), reticleColorChangeTime);
     }
 
     private void ResetReticleColor() {
-        reticle.GetComponent<SpriteRenderer>().color = baseReticleColor;
+        gameObject.GetComponent<SpriteRenderer>().color = baseReticleColor;
     }
 }

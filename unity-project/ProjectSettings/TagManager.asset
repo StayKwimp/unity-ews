@@ -11,7 +11,7 @@ TagManager:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Invisible with no Collision
   - Water
   - UI
   - whatIsGround

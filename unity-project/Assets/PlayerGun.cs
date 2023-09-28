@@ -164,7 +164,7 @@ public class PlayerGun : MonoBehaviour
 
 
     public void PlaySound(string name) {
-        Debug.Log($"Play sound: {name}");
+        // Debug.Log($"Play sound: {name}");
         audioManager.GetComponent<AudioManager>().Play(name);
     }
 
