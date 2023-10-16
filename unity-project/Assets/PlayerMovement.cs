@@ -69,6 +69,8 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Graphics")]
     public TextMeshProUGUI healthDisplay;
+    public TextMeshProUGUI killsDisplay;
+    public int kills = 0;
 
 
 
@@ -127,6 +129,9 @@ public class PlayerMovement : MonoBehaviour
 
         // update de health bar display als het bestaat
         if (healthDisplay != null) healthDisplay.SetText(string.Format("Health: {0}", health));
+
+        // net zoals de kills display
+        if (killsDisplay != null) killsDisplay.SetText(string.Format("Kills: {0}", kills));
     }
 
 
@@ -464,8 +469,8 @@ public class PlayerMovement : MonoBehaviour
 
         if (health <= 0) {
             // vul hier iets van een game over in ofzo
-            string currentSceneName = SceneManager.GetActiveScene().name;
-            SceneManager.LoadScene(currentSceneName);
+            // string currentSceneName = SceneManager.GetActiveScene().name;
+            SceneManager.LoadScene("Deathmenu");
         }
     }
 }

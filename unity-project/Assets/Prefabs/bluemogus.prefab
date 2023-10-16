@@ -237,7 +237,7 @@ MonoBehaviour:
   whatIsPlayer:
     serializedVersion: 2
     m_Bits: 512
-  health: 120
+  health: 60
   walkPoint: {x: 0, y: 0, z: 0}
   walkPointRange: 5
   maxWalkPointReachTime: 240

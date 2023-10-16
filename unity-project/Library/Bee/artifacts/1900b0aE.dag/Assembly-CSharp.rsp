@@ -352,6 +352,7 @@
 "Assets/DestroyAfterTimePeriod.cs"
 "Assets/EnemyMovement.cs"
 "Assets/EnemySpawnController.cs"
+"Assets/MenuScript.cs"
 "Assets/MogusExplosiveBullet.cs"
 "Assets/MoveCamera.cs"
 "Assets/MuzzleFlashMovement.cs"

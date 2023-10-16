@@ -99,4 +99,5 @@ MonoBehaviour:
   enemyPrefabs:
   - {fileID: 5057620484507589842, guid: ebb98a5c1f1338548b68bbf66fe0b4f5, type: 3}
   - {fileID: 5579901441597745758, guid: 6a569907e18f8bc42aea2404edc485b1, type: 3}
+  maxSpawnRadius: 2
   maxNavmeshFindRange: 3

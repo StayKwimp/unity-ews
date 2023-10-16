@@ -52,6 +52,7 @@ public class EnemySpawnController : MonoBehaviour
                 
                 // verwijder de timer als de enemy succesvol gespawned is
                 if (success) spawnQueueTimers.RemoveAt(i);
+                // zo niet, probeer dan nog een enemy te spawnen op de volgende frame
             }
         }
         

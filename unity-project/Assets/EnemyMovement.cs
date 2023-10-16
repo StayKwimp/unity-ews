@@ -269,6 +269,10 @@ public class EnemyMovement : MonoBehaviour
     private void DestroyEnemy() {
         Destroy(gameObject);
 
+        // voeg een kill toe
+        GameObject.Find("Player").GetComponent<PlayerMovement>().kills += 1;
+
+        // flash de reticle
         reticleGameObject.GetComponent<ReticleColor>().FlashReticleColor();
     }
 }
