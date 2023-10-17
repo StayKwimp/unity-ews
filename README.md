@@ -6,3 +6,10 @@ De Unity editor version die voor het project in *unity-project* staat is **2021.
 
 ## Spelen
 Om de verschillende versies van de game te kunnen spelen, ga je naar de [releases](https://github.com/StayKwimp/unity-ews/releases).
+
+## Controls
+    WASD - Bewegen
+    LMB - Schieten
+    RMB - ADS
+    X - Crouch
+    R - Reload

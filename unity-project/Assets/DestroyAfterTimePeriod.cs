@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class DestroyAfterTimePeriod : MonoBehaviour
 {
-    public GameObject objectToDestroy;
     public float destroyDelay;
 
     void Start() {
@@ -14,6 +13,6 @@ public class DestroyAfterTimePeriod : MonoBehaviour
     
 
     private void DestroyObject() {
-        Destroy(objectToDestroy);
+        Destroy(gameObject);
     }
 }

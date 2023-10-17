@@ -50,7 +50,7 @@ public class PlayerBullet : MonoBehaviour
 
         // destroy de bullet als het een enemy raakt
         if (collision.collider.CompareTag("Enemy")) {
-            collision.collider.GetComponent<EnemyMovement>().TakeDamage(damage);
+            // collision.collider.GetComponent<EnemyMovement>().TakeDamage(damage);
             Invoke("DestroyBullet", 0.02f);
         }
     }

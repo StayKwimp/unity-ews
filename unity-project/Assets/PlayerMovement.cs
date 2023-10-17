@@ -132,6 +132,13 @@ public class PlayerMovement : MonoBehaviour
 
         // net zoals de kills display
         if (killsDisplay != null) killsDisplay.SetText(string.Format("Kills: {0}", kills));
+
+
+        // check of de speler onder y = -64 is.
+        // als dat zo is, e l i m i n e e r de speler
+        if (gameObject.transform.position.y <= -64f) {
+            TakeDamage(maxHealth + 1);
+        }
     }
 
 
@@ -469,8 +476,12 @@ public class PlayerMovement : MonoBehaviour
 
         if (health <= 0) {
             // vul hier iets van een game over in ofzo
-            // string currentSceneName = SceneManager.GetActiveScene().name;
-            SceneManager.LoadScene("Deathmenu");
+            string currentSceneName = SceneManager.GetActiveScene().name;
+            SceneManager.LoadScene(currentSceneName);
+
+            // uncomment dit hieronder en comment dit hierboven voor full releases!
+
+            // SceneManager.LoadScene("Deathmenu");
         }
     }
 }

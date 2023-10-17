@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static PlayerBullet;
 using TMPro;
 
 public class PlayerGun : MonoBehaviour
@@ -26,6 +28,8 @@ public class PlayerGun : MonoBehaviour
     // camera en attack reference point
     public Camera playerCam;
     public Transform attackPoint;
+    public PlayerBullet bulletScr;
+    public string enemyTag;
 
     public float bulletMaxTime;
 
@@ -42,14 +46,21 @@ public class PlayerGun : MonoBehaviour
     public KeyCode fireKey = KeyCode.Mouse0;
     public KeyCode reloadKey;
 
+    [Header("ADS")]
+    public Vector3 initialGunPosition;
+    public Vector3 ADSGunPosition;
+    public float switchGunPosAnimationTime;
+    
+
 
     [Header("Sounds")]
     public GameObject audioManager;
 
 
-
+    [Header("Debug")]
     // bugfixing (holie shid)
     public bool allowInvoke = true;
+    public GameObject raycastHitMarker;
 
 
     private void Awake() {
@@ -108,17 +119,47 @@ public class PlayerGun : MonoBehaviour
         else targetPoint = ray.GetPoint(75);
 
 
+
+
         // de direction van attackpoint naar targetpoint
         // de vector van A naar B is positie B - positie A
         Vector3 directionWithoutSpread = targetPoint - attackPoint.position;
 
         // bullet spread
-        float xSpread = Random.Range(-spread, spread);
-        float ySpread = Random.Range(-spread, spread);
+        float xSpread = UnityEngine.Random.Range(-spread, spread);
+        float ySpread = UnityEngine.Random.Range(-spread, spread);
 
 
         // nieuwe direction met spread
-        Vector3 directionWithSpread = directionWithoutSpread + new Vector3(xSpread, ySpread, 0);
+        Vector3 totalSpread = new Vector3(xSpread, ySpread, 0);
+        Vector3 directionWithSpread = directionWithoutSpread + totalSpread;
+
+
+        // nu hetzelfde met de camera
+        Vector3 camDirWithoutSpread = targetPoint - playerCam.transform.position;
+        Vector3 camDirWithSpread = camDirWithoutSpread + totalSpread;
+
+
+        // raycast die met spread vanuit de camera position naar de enemy gaat
+        RaycastHit enemyHit;
+        if (Physics.Raycast(playerCam.transform.position, camDirWithSpread, out enemyHit, Mathf.Infinity)) {
+
+        
+
+            // debug
+            Debug.DrawRay(playerCam.transform.position, camDirWithSpread, Color.red, 6f);
+            Instantiate(raycastHitMarker, enemyHit.point, Quaternion.identity);
+
+            try {
+                if (enemyHit.collider.CompareTag(enemyTag)) {
+                    var bulletDamage = bulletScr.damage;
+                    enemyHit.collider.GetComponentInParent<EnemyMovement>().TakeDamage(bulletDamage);
+                }
+                
+            } catch (Exception e) {
+                Debug.LogWarning($"Fired gun but an error occured! Most likely the raycast hit something that doesn't have a collider. (Collider: {enemyHit.collider}) \nIf not, the collider with tag '{enemyTag}' it hit doesn't have the EnemyMovement component in either itself or its parent(s). \nException: {e}");
+            }
+        }
 
 
 

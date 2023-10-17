@@ -77,9 +77,33 @@ public class EnemyMovement : MonoBehaviour
 
         // Debug.Log($"playerInSightRange: {playerInSightRange}, playerInAttackRange: {playerInAttackRange}, playerInLeaveAttackRange: {playerInLeaveAttackRange}, attacking: {attacking}");
 
+        RaycastHit hit;
+        bool hittable;
+        // doe een raycast om te controleren of de speler daadwerkelijk in de line of sight van de mogus zit
+
+        Vector3 directionToPlayer = player.position - bulletSpawnpoint.position;
+
+        if(Physics.Raycast(bulletSpawnpoint.position, directionToPlayer, out hit, sightRange))
+        {
+            // Debug.Log(hit.collider);
+            hittable = hit.collider.CompareTag("Player");
+        }
+        else {
+            hittable = false;
+            // Debug.Log("Raycast hit nothing");
+        }
+
+        // debug
+        Debug.DrawRay(bulletSpawnpoint.position, directionToPlayer, Color.blue, 6f);
+
+
+
+
+
 
         if (attacking) {
             attacking = playerInLeaveAttackRange;
+            if (!hittable) attacking = false;
         }
 
         if (!playerInSightRange) {
@@ -88,9 +112,14 @@ public class EnemyMovement : MonoBehaviour
         }
         else if (!playerInAttackRange && !playerInLeaveAttackRange) ChasePlayer();
 
-        if ((playerInAttackRange && playerInSightRange) || attacking) {
+        if ((playerInAttackRange && playerInSightRange && hittable)|| attacking) {
             AttackPlayer();
             attacking = true;
+        }
+        else if (playerInAttackRange && playerInSightRange && !hittable)
+        {
+            ChasePlayer();
+            //Debug.Log("activated");
         }
         
     }
