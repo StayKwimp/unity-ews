@@ -391,6 +391,7 @@ MonoBehaviour:
   maxWalkPointReachTime: 240
   timeBetweenAttacks: 0.1
   attackType: 0
+  ChaseDelay: 0.5
   projectile: {fileID: 1979349900344900966, guid: 718f3b53eb1397141bab292f50fcee3c, type: 3}
   shootForceMul:
   - 1

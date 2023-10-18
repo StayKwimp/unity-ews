@@ -29,6 +29,7 @@ public class EnemyMovement : MonoBehaviour
     public enum Weapon {Bullets, Grenades};
     public Weapon attackType;
     private bool alreadyAttacked = false;
+    public float ChaseDelay = 1;
 
     [Header("Grenades/Bullets")]
     public GameObject projectile;
@@ -175,12 +176,26 @@ public class EnemyMovement : MonoBehaviour
 
 
 
+    private IEnumerator DelayChase()
+    {
+        //zorgt ervoor dat het 1 seconde duurt voordat hij tot stilstand komt
+        yield return new WaitForSeconds(1);
+
+        // zorg dat de enemy niet gaat gebewegen door de destination op zijn current position te zetten
+        agent.SetDestination(transform.position);
+
+    }
+
+
+
 
 
 
     private void AttackPlayer() {
-        // zorg dat de enemy niet gaat gebewegen door de destination op zijn current position te zetten
-        agent.SetDestination(transform.position);
+
+        StartCoroutine(DelayChase());
+
+        
 
         // we willen niet dat de enemy model naar boven of beneden draait. daarom laten we de y rotation staan op die van de enemy zelf
         // LookAt neemt de twee verschillende positions van de Vector3 en de transform,
