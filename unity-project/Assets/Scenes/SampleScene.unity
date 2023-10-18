@@ -443,6 +443,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sensX: 1500
   sensY: 1500
+  playerGun: {fileID: 2000761142}
+  sensMultiplierOnADS: 0.5
   orientation: {fileID: 1493575646}
 --- !u!81 &345178898
 AudioListener:
@@ -1152,7 +1154,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 931010346}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1217,6 +1219,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sensX: 1500
   sensY: 1500
+  playerGun: {fileID: 2000761142}
+  sensMultiplierOnADS: 0.5
   orientation: {fileID: 1493575646}
 --- !u!81 &931010350
 AudioListener:
@@ -2522,6 +2526,22 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1773200902107857197, guid: 8b65fafb152cb344c90663bfc5e143e9, type: 3}
   m_PrefabInstance: {fileID: 1773200901261419062}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2000761142 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2761702954008720913, guid: 48ede168ac805224ea92d103c55cc7c6, type: 3}
+  m_PrefabInstance: {fileID: 2761702953555973475}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2000761143 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2761702954008720919, guid: 48ede168ac805224ea92d103c55cc7c6, type: 3}
+  m_PrefabInstance: {fileID: 2761702953555973475}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2000761142}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a3e84e74dbc5544487746efe8353a5a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2026011371
 GameObject:
   m_ObjectHideFlags: 0
@@ -2950,7 +2970,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2761702954008720919, guid: 48ede168ac805224ea92d103c55cc7c6, type: 3}
       propertyPath: spread
-      value: 0.45
+      value: 1.35
       objectReference: {fileID: 0}
     - target: {fileID: 2761702954008720919, guid: 48ede168ac805224ea92d103c55cc7c6, type: 3}
       propertyPath: enemyTag
@@ -2963,11 +2983,19 @@ PrefabInstance:
     - target: {fileID: 2761702954008720919, guid: 48ede168ac805224ea92d103c55cc7c6, type: 3}
       propertyPath: playerCam
       value: 
-      objectReference: {fileID: 931010348}
+      objectReference: {fileID: 345178899}
     - target: {fileID: 2761702954008720919, guid: 48ede168ac805224ea92d103c55cc7c6, type: 3}
       propertyPath: ammoDisplay
       value: 
       objectReference: {fileID: 5999429}
+    - target: {fileID: 2761702954008720919, guid: 48ede168ac805224ea92d103c55cc7c6, type: 3}
+      propertyPath: recoilOnADS
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 2761702954008720919, guid: 48ede168ac805224ea92d103c55cc7c6, type: 3}
+      propertyPath: spreadOnADS
+      value: 0.1
+      objectReference: {fileID: 0}
     - target: {fileID: 2761702954008720919, guid: 48ede168ac805224ea92d103c55cc7c6, type: 3}
       propertyPath: audioManager
       value: 
@@ -2975,6 +3003,22 @@ PrefabInstance:
     - target: {fileID: 2761702954008720919, guid: 48ede168ac805224ea92d103c55cc7c6, type: 3}
       propertyPath: magazineSize
       value: 45
+      objectReference: {fileID: 0}
+    - target: {fileID: 2761702954008720919, guid: 48ede168ac805224ea92d103c55cc7c6, type: 3}
+      propertyPath: recoilOnHipfire
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2761702954008720919, guid: 48ede168ac805224ea92d103c55cc7c6, type: 3}
+      propertyPath: ADSGunPosition.x
+      value: -0.433
+      objectReference: {fileID: 0}
+    - target: {fileID: 2761702954008720919, guid: 48ede168ac805224ea92d103c55cc7c6, type: 3}
+      propertyPath: ADSGunPosition.y
+      value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 2761702954008720919, guid: 48ede168ac805224ea92d103c55cc7c6, type: 3}
+      propertyPath: ADSGunPosition.z
+      value: 0.56
       objectReference: {fileID: 0}
     - target: {fileID: 2761702954008720919, guid: 48ede168ac805224ea92d103c55cc7c6, type: 3}
       propertyPath: raycastHitMarker
@@ -2986,8 +3030,20 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2761702954008720919, guid: 48ede168ac805224ea92d103c55cc7c6, type: 3}
       propertyPath: switchGunPosAnimationTime
-      value: 0.4
+      value: 0.15
       objectReference: {fileID: 0}
+    - target: {fileID: 2761702954008720919, guid: 48ede168ac805224ea92d103c55cc7c6, type: 3}
+      propertyPath: camerasForRecoil.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2761702954008720919, guid: 48ede168ac805224ea92d103c55cc7c6, type: 3}
+      propertyPath: camerasForRecoil.Array.data[0]
+      value: 
+      objectReference: {fileID: 345178897}
+    - target: {fileID: 2761702954008720919, guid: 48ede168ac805224ea92d103c55cc7c6, type: 3}
+      propertyPath: camerasForRecoil.Array.data[1]
+      value: 
+      objectReference: {fileID: 931010349}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 48ede168ac805224ea92d103c55cc7c6, type: 3}
 --- !u!1001 &3240804981378967987
@@ -3014,6 +3070,10 @@ PrefabInstance:
       value: 1000000
       objectReference: {fileID: 0}
     - target: {fileID: 3240804981990356061, guid: cdb5f1159d1c1a242b158ad99005e3ce, type: 3}
+      propertyPath: playerGunScr
+      value: 
+      objectReference: {fileID: 2000761143}
+    - target: {fileID: 3240804981990356061, guid: cdb5f1159d1c1a242b158ad99005e3ce, type: 3}
       propertyPath: healthDisplay
       value: 
       objectReference: {fileID: 1919387736}
@@ -3024,6 +3084,10 @@ PrefabInstance:
     - target: {fileID: 3240804981990356061, guid: cdb5f1159d1c1a242b158ad99005e3ce, type: 3}
       propertyPath: healCooldownTime
       value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3240804981990356061, guid: cdb5f1159d1c1a242b158ad99005e3ce, type: 3}
+      propertyPath: movementSpeedMultiplierOnADS
+      value: 0.35
       objectReference: {fileID: 0}
     - target: {fileID: 3240804981990356062, guid: cdb5f1159d1c1a242b158ad99005e3ce, type: 3}
       propertyPath: m_RootOrder

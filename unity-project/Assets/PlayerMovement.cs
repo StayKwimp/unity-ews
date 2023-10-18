@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
+using static PlayerGun;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -28,6 +29,10 @@ public class PlayerMovement : MonoBehaviour
     public float crouchYScale;
     public bool toggleCrouch;
     private float startYScale;
+
+    [Header("ADS")]
+    public float movementSpeedMultiplierOnADS;
+    public PlayerGun playerGunScr;
 
     // key bindings
     [Header("Keybinds")]
@@ -370,17 +375,31 @@ public class PlayerMovement : MonoBehaviour
 
         // limit speed on ground/air
         } else {
-            // get current horizontal velocity
-            Vector3 flatVel = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+            
 
-            // if current velocity is higher than the maximum allowed movement speed
-            if (flatVel.magnitude > maxSpeed) {
-                // calculate maximum allowed velocity (by max speed)
-                Vector3 limitedVelocity = flatVel.normalized * maxSpeed;
+            var ADSEnabled = playerGunScr.ADSEnabled;
 
-                // apply new limited velocity to player object
-                rb.velocity = new Vector3(limitedVelocity.x, rb.velocity.y, limitedVelocity.z);
+            // als ADS aan is, is de maxSpeed kleiner
+            if (ADSEnabled) {
+                LimitMaxSpeed(maxSpeed * movementSpeedMultiplierOnADS);
+
+            } else {
+                LimitMaxSpeed(maxSpeed);
             }
+        }
+    }
+
+    private void LimitMaxSpeed(float maximumSpeed) {
+        // get current horizontal velocity
+        Vector3 flatVel = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+        
+        // if current velocity is higher than the maximum allowed movement speed
+        if (flatVel.magnitude > maximumSpeed) {
+            // calculate maximum allowed velocity (by max speed)
+            Vector3 limitedVelocity = flatVel.normalized * maximumSpeed;
+
+            // apply new limited velocity to player object
+            rb.velocity = new Vector3(limitedVelocity.x, rb.velocity.y, limitedVelocity.z);
         }
     }
 

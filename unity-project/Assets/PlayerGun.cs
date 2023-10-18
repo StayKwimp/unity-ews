@@ -7,6 +7,7 @@ using TMPro;
 
 public class PlayerGun : MonoBehaviour
 {
+    [Header("Bullets")]
     // bullet
     public GameObject bullet;
 
@@ -14,6 +15,7 @@ public class PlayerGun : MonoBehaviour
     public float shootForce, upwardForce;
 
     // gun stats
+    [Header("Gun Stats")]
     public float timeBetweenShooting, spread, reloadTime, timeBetweenShots;
     public int magazineSize, bulletsPerTap;
     public bool allowButtonHold;
@@ -26,7 +28,11 @@ public class PlayerGun : MonoBehaviour
 
 
     // camera en attack reference point
+    [Header("Camera")]
     public Camera playerCam;
+    public PlayerCam[] camerasForRecoil;
+
+    [Header("Reference points")]
     public Transform attackPoint;
     public PlayerBullet bulletScr;
     public string enemyTag;
@@ -40,16 +46,27 @@ public class PlayerGun : MonoBehaviour
     public TextMeshProUGUI ammoDisplay;
 
 
-
-
     [Header("Controls")]
     public KeyCode fireKey = KeyCode.Mouse0;
+    public KeyCode ADSKey = KeyCode.Mouse1;
     public KeyCode reloadKey;
 
     [Header("ADS")]
     public Vector3 initialGunPosition;
     public Vector3 ADSGunPosition;
     public float switchGunPosAnimationTime;
+    public float spreadOnADS;
+
+    private Vector3 gunSwitchDirection;
+    private Vector3 originalGunPosition;
+
+    public bool ADSEnabled;
+    private float timeBetweenLastADSSwitch;
+    private bool movingGun;
+
+    [Header("Recoil")]
+    public float recoilOnHipfire;
+    public float recoilOnADS;
     
 
 
@@ -67,11 +84,21 @@ public class PlayerGun : MonoBehaviour
         // vul het magazijn
         bulletsLeft = magazineSize;
         readyToShoot = true;
+
+        
+        
+        if (switchGunPosAnimationTime <= 0) {
+            Debug.LogError("PlayerGun: switchGunPosAnimationTime may not be 0 or smaller than 0");
+            UnityEditor.EditorApplication.isPlaying = false;
+            Application.Quit();
+        }
     }
 
 
     private void Update() {
         MyInput();
+
+        AnimateGun();
 
         // set ammo display if it exists
         if (ammoDisplay != null) {
@@ -92,14 +119,77 @@ public class PlayerGun : MonoBehaviour
         // ga automatisch reloaden als je geen kogels meer over hebt
         if (readyToShoot && shooting && !reloading && bulletsLeft <= 0) Reload();
 
+
+
+        // ADS
+        timeBetweenLastADSSwitch += Time.deltaTime;
+
+
+        var ADSOneFrameEarlier = ADSEnabled;
+
+        ADSEnabled = Input.GetKey(ADSKey);
+
+        // je kan geen ADS gebruiken tijdens reloads
+        if (reloading) ADSEnabled = false;
+        
+
+        // als de ADS deze frame geswitcht is, zet de time between last ads switch op nul (voor animatie)
+        if (ADSOneFrameEarlier != ADSEnabled) {
+            timeBetweenLastADSSwitch = 0f;
+            originalGunPosition = transform.localPosition;
+
+            // bepaal de ADS gun switch direction
+            // als ADS aan is, is de direction naar de ADS gun position, als ADS uit is, is de direction de andere kant op naar de initial gun position
+            if (ADSEnabled) gunSwitchDirection = ADSGunPosition - originalGunPosition;
+            else gunSwitchDirection = initialGunPosition - originalGunPosition;
+        }
+        
+
+
+
         // daadwerkelijk schieten
-        if (readyToShoot && shooting && !reloading && bulletsLeft > 0) {
+        // je mag niet schieten tijdens het switchen van aiming mode (hip fire en ADS)
+        if (readyToShoot && shooting && !reloading && bulletsLeft > 0 && !movingGun) {
             bulletsShot = 0;
 
             Shoot();
         }
+
+        
     }
 
+
+    private void AnimateGun() {
+        // ADS animation handler
+
+        // check of zojuist ADS uit of aan is gezet
+        if (timeBetweenLastADSSwitch <= switchGunPosAnimationTime) {
+            movingGun = true;
+            var animationProgressPct = timeBetweenLastADSSwitch / switchGunPosAnimationTime;
+
+            // beweeg de gun, de direction wordt al bepaald in MyInput()
+            transform.localPosition = originalGunPosition + (gunSwitchDirection * animationProgressPct);
+        } else {
+            movingGun = false;
+            if (ADSEnabled) transform.localPosition = ADSGunPosition;
+            else transform.localPosition = initialGunPosition;
+        }
+
+    }
+    
+
+    private void ApplyRecoil() {
+        // bepaal het aantal recoil
+        var recoilAmount = 0f;
+        if (ADSEnabled) recoilAmount = recoilOnADS;
+        else recoilAmount = recoilOnHipfire;
+
+        // apply de recoil op elke camera
+        for (int i = 0; i < camerasForRecoil.Length; i++) {
+            // Debug.Log($"Apply recoil amount {recoilAmount} on camera {camerasForRecoil[i]}");
+            camerasForRecoil[i].RotateCamera(0f, recoilAmount);
+        }
+    }
 
 
     private void Shoot() {
@@ -126,8 +216,16 @@ public class PlayerGun : MonoBehaviour
         Vector3 directionWithoutSpread = targetPoint - attackPoint.position;
 
         // bullet spread
-        float xSpread = UnityEngine.Random.Range(-spread, spread);
-        float ySpread = UnityEngine.Random.Range(-spread, spread);
+        float xSpread = 0f;
+        float ySpread = 0f;
+        if (ADSEnabled) {
+            // gebruik een andere spread bij ADS
+            xSpread = UnityEngine.Random.Range(-spreadOnADS, spreadOnADS);
+            ySpread = UnityEngine.Random.Range(-spreadOnADS, spreadOnADS);
+        } else {
+            xSpread = UnityEngine.Random.Range(-spread, spread);
+            ySpread = UnityEngine.Random.Range(-spread, spread);
+        }
 
 
         // nieuwe direction met spread
@@ -201,6 +299,10 @@ public class PlayerGun : MonoBehaviour
 
         // als er meer dan één bullet per tap is, herhaal deze functie dan (bijv. shotguns hebben meer dan 1 bullet)
         if (bulletsShot < bulletsPerTap && bulletsLeft > 0) Invoke("Shoot", timeBetweenShots);
+
+
+        // apply recoil
+        ApplyRecoil();
     }
 
 
