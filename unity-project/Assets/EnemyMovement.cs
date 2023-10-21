@@ -12,6 +12,7 @@ public class EnemyMovement : MonoBehaviour
     public Transform player;
     public LayerMask whatIsGround, whatIsPlayer;
     public int health;
+    
 
 
     // patrolling state
@@ -179,7 +180,7 @@ public class EnemyMovement : MonoBehaviour
     private IEnumerator DelayChase()
     {
         //zorgt ervoor dat het 1 seconde duurt voordat hij tot stilstand komt
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(ChaseDelay);
 
         // zorg dat de enemy niet gaat gebewegen door de destination op zijn current position te zetten
         agent.SetDestination(transform.position);

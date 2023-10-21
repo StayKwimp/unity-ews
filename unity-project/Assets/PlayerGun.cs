@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using static PlayerBullet;
+using static PlayerMovement;
 using TMPro;
 
 public class PlayerGun : MonoBehaviour
@@ -24,7 +25,8 @@ public class PlayerGun : MonoBehaviour
 
 
     // bools
-    private bool shooting, readyToShoot, reloading;
+    private bool shooting, readyToShoot;
+    public bool reloading;
 
 
     // camera en attack reference point
@@ -32,10 +34,11 @@ public class PlayerGun : MonoBehaviour
     public Camera playerCam;
     public PlayerCam[] camerasForRecoil;
 
-    [Header("Reference points")]
+    [Header("References")]
     public Transform attackPoint;
     public PlayerBullet bulletScr;
     public string enemyTag;
+    public PlayerMovement playerScr;
 
     public float bulletMaxTime;
 
@@ -64,6 +67,18 @@ public class PlayerGun : MonoBehaviour
     private float timeBetweenLastADSSwitch;
     private bool movingGun;
 
+
+    [Header("Grenades")]
+    public Vector3 grenadeGunPosition;
+    public float hideGunAnimationTime;
+    private bool throwingGrenade;
+    private float grenadeThrowAnimationProgress;
+    private Vector3 gunGrenadeSwitchDirection;
+    private bool noADSAnimation = false;
+
+    private bool allowEndGrenadeAnimation;
+    private bool allowEndADSAnimation;
+
     [Header("Recoil")]
     public float recoilOnHipfire;
     public float recoilOnADS;
@@ -75,7 +90,6 @@ public class PlayerGun : MonoBehaviour
 
 
     [Header("Debug")]
-    // bugfixing (holie shid)
     public bool allowInvoke = true;
     public GameObject raycastHitMarker;
 
@@ -84,6 +98,9 @@ public class PlayerGun : MonoBehaviour
         // vul het magazijn
         bulletsLeft = magazineSize;
         readyToShoot = true;
+
+        // zet de ads animation progress op een groot getal, zodat de animatie niet gaat spelen bij de game start
+        timeBetweenLastADSSwitch = 300f;
 
         
         
@@ -96,6 +113,14 @@ public class PlayerGun : MonoBehaviour
 
 
     private void Update() {
+        // verkrijg info over of de player een granaat aan het gooien is
+        throwingGrenade = playerScr.throwingGrenade;
+        // en ook voor hoe lang
+        grenadeThrowAnimationProgress = playerScr.grenadeAnimationProgress;
+
+
+
+
         MyInput();
 
         AnimateGun();
@@ -114,10 +139,10 @@ public class PlayerGun : MonoBehaviour
         else shooting = Input.GetKeyDown(fireKey);
 
         // reloading
-        if (Input.GetKeyDown(reloadKey) && bulletsLeft < magazineSize && !reloading) Reload();
+        if (Input.GetKeyDown(reloadKey) && bulletsLeft < magazineSize && !reloading && !throwingGrenade) Reload();
 
         // ga automatisch reloaden als je geen kogels meer over hebt
-        if (readyToShoot && shooting && !reloading && bulletsLeft <= 0) Reload();
+        if (readyToShoot && shooting && !reloading && bulletsLeft <= 0 && !throwingGrenade) Reload();
 
 
 
@@ -129,8 +154,8 @@ public class PlayerGun : MonoBehaviour
 
         ADSEnabled = Input.GetKey(ADSKey);
 
-        // je kan geen ADS gebruiken tijdens reloads
-        if (reloading) ADSEnabled = false;
+        // je kan geen ADS gebruiken tijdens reloads of granaten gooien
+        if (reloading || throwingGrenade) ADSEnabled = false;
         
 
         // als de ADS deze frame geswitcht is, zet de time between last ads switch op nul (voor animatie)
@@ -149,10 +174,23 @@ public class PlayerGun : MonoBehaviour
 
         // daadwerkelijk schieten
         // je mag niet schieten tijdens het switchen van aiming mode (hip fire en ADS)
-        if (readyToShoot && shooting && !reloading && bulletsLeft > 0 && !movingGun) {
+        // en ook niet als je een granaat aan het gooien bent
+        // en als de animatie van het grenade terugdoen nog speelt
+        if (readyToShoot && shooting && !reloading && bulletsLeft > 0 && !movingGun && !throwingGrenade) {
             bulletsShot = 0;
 
             Shoot();
+        }
+
+
+        // granaedae
+        // aan het begin van de animatie is de direction naar de grenade gun position (dus naar beneden)
+        if (throwingGrenade) {
+            gunGrenadeSwitchDirection = grenadeGunPosition - transform.localPosition;
+        }
+        // aan het einde is het juist andersom
+        else {
+            gunGrenadeSwitchDirection = initialGunPosition - grenadeGunPosition;
         }
 
         
@@ -160,23 +198,62 @@ public class PlayerGun : MonoBehaviour
 
 
     private void AnimateGun() {
-        // ADS animation handler
+        // Animation Handler
 
-        // check of zojuist ADS uit of aan is gezet
-        if (timeBetweenLastADSSwitch <= switchGunPosAnimationTime) {
+
+        // eerst de grenade animatie
+        if (grenadeThrowAnimationProgress <= hideGunAnimationTime || (/*deze is voor als de granaat al gegooid is*/ grenadeThrowAnimationProgress > playerScr.animationStopTime && grenadeThrowAnimationProgress <= (hideGunAnimationTime + playerScr.animationStopTime - 0.051f))) {
             movingGun = true;
-            var animationProgressPct = timeBetweenLastADSSwitch / switchGunPosAnimationTime;
+            // zorg dat er geen beweging komt bij het ADS deel
+            noADSAnimation = true;
 
-            // beweeg de gun, de direction wordt al bepaald in MyInput()
-            transform.localPosition = originalGunPosition + (gunSwitchDirection * animationProgressPct);
-        } else {
+            // beweeg
+            transform.localPosition += gunGrenadeSwitchDirection * (Time.deltaTime / switchGunPosAnimationTime);
+            allowEndGrenadeAnimation = true;
+        } else if (allowEndGrenadeAnimation) {
+            Debug.Log("Ended Grenade Animation");
+
             movingGun = false;
-            if (ADSEnabled) transform.localPosition = ADSGunPosition;
+            // zet de gun op de correcte positie als de animatie afgelopen is
+            if (throwingGrenade) transform.localPosition = grenadeGunPosition;
             else transform.localPosition = initialGunPosition;
+
+            allowEndGrenadeAnimation = false;
+            noADSAnimation = false;
+            
         }
 
+
+        // daarna ADS
+        // check of er zojuist ADS aan of uit gezet is
+        // ADS mag geen animatie doen als de grenade animatie al afgespeeld wordt
+        if (timeBetweenLastADSSwitch <= switchGunPosAnimationTime && !noADSAnimation) {
+            movingGun = true;
+            
+            // beweeg
+            
+            transform.localPosition += gunSwitchDirection * (Time.deltaTime / switchGunPosAnimationTime);
+            allowEndADSAnimation = true;
+        } else if (!noADSAnimation) {
+            // als de animatie afgelopen is, zorg dan dat de gun voor één keer op de goede plek wordt gezet
+            if (allowEndADSAnimation) {
+                Debug.Log("Ended ADS Animation");
+                // zet de gun op de correcte positie als de animatie afgelopen is
+                movingGun = false;
+                if (ADSEnabled) transform.localPosition = ADSGunPosition;
+                else transform.localPosition = initialGunPosition;
+
+                allowEndADSAnimation = false;
+            }
+            
+        // om te voorkomen dat de gun ineens naar een positie gaat waar hij niet heen hoort te gaan
+        // mag de gun geen ADS animatie afmaken als de grenade animatie loopt
+        } else if (noADSAnimation) {
+            allowEndADSAnimation = false;
+        }
     }
     
+
 
     private void ApplyRecoil() {
         // bepaal het aantal recoil
@@ -187,7 +264,7 @@ public class PlayerGun : MonoBehaviour
         // apply de recoil op elke camera
         for (int i = 0; i < camerasForRecoil.Length; i++) {
             // Debug.Log($"Apply recoil amount {recoilAmount} on camera {camerasForRecoil[i]}");
-            camerasForRecoil[i].RotateCamera(0f, recoilAmount);
+            camerasForRecoil[i].SmoothRotateCameraInit(0f, recoilAmount, 1.1f);
         }
     }
 
@@ -245,7 +322,7 @@ public class PlayerGun : MonoBehaviour
         
 
             // debug
-            Debug.DrawRay(playerCam.transform.position, camDirWithSpread, Color.red, 6f);
+            // Debug.DrawRay(playerCam.transform.position, camDirWithSpread, Color.red, 6f);
             Instantiate(raycastHitMarker, enemyHit.point, Quaternion.identity);
 
             try {

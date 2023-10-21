@@ -8,6 +8,9 @@ using static PlayerGun;
 public class PlayerMovement : MonoBehaviour
 {
     // hmm yes bewegen my beloved
+    [Header("Definitions")]
+    public Camera playerCam;
+
     [Header("Movement")]
     private float mvSpeed;
     private float maxSpeed;
@@ -39,6 +42,7 @@ public class PlayerMovement : MonoBehaviour
     public KeyCode jumpKey = KeyCode.Space;
     public KeyCode sprintKey = KeyCode.LeftShift;
     public KeyCode crouchKey = KeyCode.LeftControl;
+    public KeyCode grenadeKey;
     private bool crouchKeyPressed;
 
     // controle of de speler op de grond staat of niet
@@ -69,6 +73,22 @@ public class PlayerMovement : MonoBehaviour
     public int maxArmor;
     public float healCooldownTime;
     public int healthPerSecond;
+    public int grenades;
+
+    [Header("Grenades")]
+    public GameObject grenadeObj;
+    public Vector3 grenadeSpawnpointDelta;
+    public float throwForce;
+    public float fuseLength = 4f;
+    public bool throwingGrenade;
+    // zet de grenade animation progress op een groot getal om te voorkomen dat er animaties gaan spelen aan het begin van de game (want anders is de animation progress gelijk aan nul, en gaat de gun zichzelf animaten)
+    public float grenadeAnimationProgress;
+    private bool thrownGrenade;
+    private float throwGrenadeAtAnimationTime = 0.5f;
+    // public want PlayerGun heeft het ook nodig
+    public float animationStopTime = 0.6f;
+
+    // health
     private float healthBuffer;
     private float secondsPastTakingDamage;
 
@@ -103,17 +123,21 @@ public class PlayerMovement : MonoBehaviour
     }
 
 
-    private void Start() {
+    private void Awake() {
         // zorg dat de player niet omvalt (rotation freezen)
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
 
         // verander StartYScale
         startYScale = transform.localScale.y;
+
+        // zet de grenade animation progress nogmaals op een groot getal
+        grenadeAnimationProgress = 300f;
     }
 
 
     private void Update() {
+        // Debug.Log($"GrenadeAnimationProgress: {grenadeAnimationProgress}");
         // ground check d.m.v. een raycast naar beneden van de helft van de spelerhoogte plus 0.2
         // de layermask whatIsGround wordt gebruikt in unity om te kijken welke objects allemaal als
         // grond gezien worden en welke niet
@@ -124,6 +148,8 @@ public class PlayerMovement : MonoBehaviour
         SpeedControl();
         StateHandler();
         HealPlayer();
+
+        GrenadeHandler();
 
         // zorg dat de drag nul is als de player niet op de grond staat
         if (grounded)
@@ -146,6 +172,43 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+
+    private void GrenadeHandler() {
+        if (throwingGrenade) {
+            // gooi pas een granaat na 0.5s
+            if (grenadeAnimationProgress >= throwGrenadeAtAnimationTime && !thrownGrenade) {
+                // spawn grenade obj
+                var grenadeSpawnpoint = transform.position + grenadeSpawnpointDelta;
+                var spawnedGrenade = Instantiate(grenadeObj, grenadeSpawnpoint, Quaternion.identity);
+
+                // bepaal de throw direction
+                // dit doen we door een ray te maken die recht uit de camera gaat in de richting van waar je door de camera kijkt.
+                // 0.5f en 0.5f is het midden van het scherm
+                // daarna gebruiken we de property .direction van een Ray (viewportPointToRay returnt een Ray)
+                Vector3 throwDirection = playerCam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f)).direction;
+
+                // rotate de g r a n a d u s
+                spawnedGrenade.transform.forward = throwDirection.normalized;
+
+                // voeg krachten toe aan de granaedae
+                spawnedGrenade.GetComponent<Rigidbody>().AddForce(throwDirection.normalized * throwForce, ForceMode.Impulse);
+
+                // start de g r a n a e d a e fuse
+                spawnedGrenade.GetComponent<PlayerGrenade>().StartFuse(fuseLength);
+
+
+                thrownGrenade = true;
+                grenades--;
+            }
+
+            // stop de animatie na 0.6s
+            if (grenadeAnimationProgress >= animationStopTime) {
+                throwingGrenade = false;
+            }
+
+        }
+        grenadeAnimationProgress += Time.deltaTime;
+    }
 
 
     private void HealPlayer() {
@@ -216,6 +279,14 @@ public class PlayerMovement : MonoBehaviour
                 // maak de speler weer normaal
                 transform.localScale = new Vector3(transform.localScale.x, startYScale, transform.localScale.z);
             }
+        }
+
+        // granador
+        var reloadingGun = playerGunScr.reloading;
+        if (Input.GetKeyDown(grenadeKey) && grounded && !throwingGrenade && !reloadingGun) {
+            throwingGrenade = true;
+            grenadeAnimationProgress = 0f;
+            thrownGrenade = false;
         }
     }
 
