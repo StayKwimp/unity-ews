@@ -356,6 +356,7 @@
 "Assets/MogusExplosiveBullet.cs"
 "Assets/MoveCamera.cs"
 "Assets/MuzzleFlashMovement.cs"
+"Assets/PlayerAuxCam.cs"
 "Assets/PlayerBullet.cs"
 "Assets/PlayerCam.cs"
 "Assets/PlayerGrenade.cs"

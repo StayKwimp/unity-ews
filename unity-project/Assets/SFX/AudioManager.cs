@@ -19,6 +19,8 @@ public class AudioManager : MonoBehaviour
             return;
         }
 
+        
+
         // DontDestroyOnLoad(gameObject);
 
         foreach (Sound s in sounds) {
@@ -29,6 +31,10 @@ public class AudioManager : MonoBehaviour
             s.source.pitch = s.pitch;
             s.source.loop = s.loop;
         }
+
+
+        Selftest();
+        Selftest();
     }
 
     public void Play(string name) {
@@ -40,6 +46,19 @@ public class AudioManager : MonoBehaviour
             return;
         }
 
-        s.source.Play();
+        Debug.Log($"Sound: {s}, Source: {s.source}");
+
+        try {
+            s.source.Play();
+        } catch (System.Exception error) {
+            Debug.LogWarning($"Audio source {s.source} doesn't exist for sound {s}!\nEror: {error}");
+        }
+    }
+
+    public void Selftest() {
+        foreach (Sound s in sounds) {
+            Debug.Log($"Sound: {s}, Source: {s.source}");
+            s.source.Play();
+        }
     }
 }

@@ -48,6 +48,12 @@ public class PlayerGun : MonoBehaviour
     public GameObject muzzleFlash;
     public TextMeshProUGUI ammoDisplay;
 
+    [Header("FOV")]
+    public float mainFOV;
+    public float FOVOnADS;
+    private int FOVAnimateDirection;
+    private float currentFov;
+
 
     [Header("Controls")]
     public KeyCode fireKey = KeyCode.Mouse0;
@@ -82,6 +88,7 @@ public class PlayerGun : MonoBehaviour
     [Header("Recoil")]
     public float recoilOnHipfire;
     public float recoilOnADS;
+    public float recoilMultiplierOnCrouching;
     
 
 
@@ -99,6 +106,8 @@ public class PlayerGun : MonoBehaviour
         bulletsLeft = magazineSize;
         readyToShoot = true;
 
+        currentFov = mainFOV;
+
         // zet de ads animation progress op een groot getal, zodat de animatie niet gaat spelen bij de game start
         timeBetweenLastADSSwitch = 300f;
 
@@ -113,6 +122,8 @@ public class PlayerGun : MonoBehaviour
 
 
     private void Update() {
+        // Debug.Log($"Position: {transform.position}, ADSEnabled: {ADSEnabled}, throwingGrenade: {throwingGrenade}");
+
         // verkrijg info over of de player een granaat aan het gooien is
         throwingGrenade = playerScr.throwingGrenade;
         // en ook voor hoe lang
@@ -124,6 +135,10 @@ public class PlayerGun : MonoBehaviour
         MyInput();
 
         AnimateGun();
+
+
+        // update camera fov
+        playerCam.fieldOfView = currentFov;
 
         // set ammo display if it exists
         if (ammoDisplay != null) {
@@ -163,10 +178,16 @@ public class PlayerGun : MonoBehaviour
             timeBetweenLastADSSwitch = 0f;
             originalGunPosition = transform.localPosition;
 
-            // bepaal de ADS gun switch direction
+            // bepaal de ADS gun switch (en fov switch) direction
             // als ADS aan is, is de direction naar de ADS gun position, als ADS uit is, is de direction de andere kant op naar de initial gun position
-            if (ADSEnabled) gunSwitchDirection = ADSGunPosition - originalGunPosition;
-            else gunSwitchDirection = initialGunPosition - originalGunPosition;
+            if (ADSEnabled) {
+                gunSwitchDirection = ADSGunPosition - originalGunPosition;
+                FOVAnimateDirection = -1;
+            } else {
+                gunSwitchDirection = initialGunPosition - originalGunPosition;
+                FOVAnimateDirection = 1;
+            }
+
         }
         
 
@@ -227,21 +248,31 @@ public class PlayerGun : MonoBehaviour
         // daarna ADS
         // check of er zojuist ADS aan of uit gezet is
         // ADS mag geen animatie doen als de grenade animatie al afgespeeld wordt
-        if (timeBetweenLastADSSwitch <= switchGunPosAnimationTime && !noADSAnimation) {
+        if (timeBetweenLastADSSwitch <= switchGunPosAnimationTime - 0.017f && !noADSAnimation) {
             movingGun = true;
             
             // beweeg
             
             transform.localPosition += gunSwitchDirection * (Time.deltaTime / switchGunPosAnimationTime);
+
+            // set the playercam fov
+            var fovDelta = mainFOV - FOVOnADS;
+            currentFov += fovDelta * (Time.deltaTime / switchGunPosAnimationTime) * FOVAnimateDirection;
+
             allowEndADSAnimation = true;
         } else if (!noADSAnimation) {
             // als de animatie afgelopen is, zorg dan dat de gun voor één keer op de goede plek wordt gezet
             if (allowEndADSAnimation) {
                 Debug.Log("Ended ADS Animation");
-                // zet de gun op de correcte positie als de animatie afgelopen is
+                // zet de gun (en de fov) op de correcte positie als de animatie afgelopen is
                 movingGun = false;
-                if (ADSEnabled) transform.localPosition = ADSGunPosition;
-                else transform.localPosition = initialGunPosition;
+                if (ADSEnabled) {
+                    transform.localPosition = ADSGunPosition;
+                    currentFov = FOVOnADS;
+                } else {
+                    transform.localPosition = initialGunPosition;
+                    currentFov = mainFOV;
+                }
 
                 allowEndADSAnimation = false;
             }
@@ -250,6 +281,7 @@ public class PlayerGun : MonoBehaviour
         // mag de gun geen ADS animatie afmaken als de grenade animatie loopt
         } else if (noADSAnimation) {
             allowEndADSAnimation = false;
+            currentFov = mainFOV;
         }
     }
     
@@ -261,10 +293,13 @@ public class PlayerGun : MonoBehaviour
         if (ADSEnabled) recoilAmount = recoilOnADS;
         else recoilAmount = recoilOnHipfire;
 
+        // verander de recoil amount als de player aan het crouchen is
+        if (playerScr.state == PlayerMovement.movementState.crouching) recoilAmount *= recoilMultiplierOnCrouching;
+
         // apply de recoil op elke camera
         for (int i = 0; i < camerasForRecoil.Length; i++) {
-            // Debug.Log($"Apply recoil amount {recoilAmount} on camera {camerasForRecoil[i]}");
-            camerasForRecoil[i].SmoothRotateCameraInit(0f, recoilAmount, 1.1f);
+            Debug.Log($"Apply recoil amount {recoilAmount} on camera {camerasForRecoil[i]}");
+            camerasForRecoil[i].SmoothRotateCameraInit(0f, recoilAmount, 1.08f);
         }
     }
 
@@ -363,9 +398,6 @@ public class PlayerGun : MonoBehaviour
         bulletsLeft--;
         bulletsShot++;
 
-        // speel geluid af
-        PlaySound("AK fire");
-
 
         // invoke de resetShot functie (als dat al niet gebeurd is)
         if (allowInvoke) {
@@ -380,11 +412,14 @@ public class PlayerGun : MonoBehaviour
 
         // apply recoil
         ApplyRecoil();
+
+        // speel geluid af
+        PlaySound("AK fire");
     }
 
 
     public void PlaySound(string name) {
-        // Debug.Log($"Play sound: {name}");
+        Debug.Log($"Play sound: {name}");
         audioManager.GetComponent<AudioManager>().Play(name);
     }
 
@@ -397,9 +432,11 @@ public class PlayerGun : MonoBehaviour
     private void Reload() {
         reloading = true;
 
+        
+        Invoke("ReloadFinished", reloadTime);
+
         // speel geluid af
         PlaySound("AK reload");
-        Invoke("ReloadFinished", reloadTime);
     }
 
     private void ReloadFinished() {

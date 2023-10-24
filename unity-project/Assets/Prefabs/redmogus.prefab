@@ -75,6 +75,7 @@ MonoBehaviour:
   maxWalkPointReachTime: 240
   timeBetweenAttacks: 1.5
   attackType: 1
+  ChaseDelay: 1
   projectile: {fileID: 4995127830615243439, guid: f1befd5bc9b36a74dadfda72fbb67b85, type: 3}
   shootForceMul:
   - 1.5
@@ -95,7 +96,7 @@ MonoBehaviour:
   playerInSightRange: 0
   playerInAttackRange: 0
   playerInLeaveAttackRange: 0
-  reticleGameObject: {fileID: 7712997047275108888, guid: 7dd4575f6c92eb7479b83e5c264ae17e, type: 3}
+  reticleGameObject: {fileID: 8424799368891404047, guid: 7dd4575f6c92eb7479b83e5c264ae17e, type: 3}
   audioManager: {fileID: 852120296705119213, guid: 6efa428e0940f274c8a371496743bf08, type: 3}
 --- !u!195 &768649175047687481
 NavMeshAgent:
