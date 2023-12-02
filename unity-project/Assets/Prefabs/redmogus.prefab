@@ -96,7 +96,7 @@ MonoBehaviour:
   playerInSightRange: 0
   playerInAttackRange: 0
   playerInLeaveAttackRange: 0
-  reticleGameObject: {fileID: 8424799368891404047, guid: 7dd4575f6c92eb7479b83e5c264ae17e, type: 3}
+  reticleGameObject: {fileID: 8424799368891404047, guid: d9b98cd157b482305883be04bb4a6062, type: 3}
   audioManager: {fileID: 852120296705119213, guid: 6efa428e0940f274c8a371496743bf08, type: 3}
 --- !u!195 &768649175047687481
 NavMeshAgent:
