@@ -24,6 +24,8 @@ public class PlayerMovement : MonoBehaviour
     public float jumpForce;
     public float jumpCooldown;
     public float airMultiplier;
+    public int maxJumps;
+    public int jumpsLeft = 0;
     bool readyToJump = true;
 
     [Header("Crouching")]
@@ -122,6 +124,7 @@ public class PlayerMovement : MonoBehaviour
         air
     }
 
+   
 
     private void Awake() {
         // zorg dat de player niet omvalt (rotation freezen)
@@ -133,6 +136,7 @@ public class PlayerMovement : MonoBehaviour
 
         // zet de grenade animation progress nogmaals op een groot getal
         grenadeAnimationProgress = 300f;
+        int jumpsLeft = maxJumps;
     }
 
 
@@ -249,15 +253,15 @@ public class PlayerMovement : MonoBehaviour
         verticalInput = Input.GetAxisRaw("Vertical");
 
 
-        // controleer of de speler op de grond staat en dat hij klaar is om te springen
-        if (Input.GetKeyDown(jumpKey) && readyToJump && grounded) {
+        // controleer of de speler op de springknop drukt
+        if (Input.GetKeyDown(jumpKey)) {
+            //zet readyToJump naar true of false afhankelijk van de omstandigheden
+            CheckJump();
             
-            readyToJump = false;
+            if(readyToJump){
+                Jump();
+            }
 
-            Jump();
-
-            // voer de funcite ResetJump na een bepaalde tijd uit (jumpCooldown om exact te zijn)
-            Invoke(nameof(ResetJump), jumpCooldown);
         }
 
 
@@ -477,6 +481,7 @@ public class PlayerMovement : MonoBehaviour
 
 
     private void Jump() {
+        jumpsLeft -= 1;
         exitingSlope = true;
         // reset y velocity
         // hierdoor spring je altijd even hoog
@@ -485,12 +490,29 @@ public class PlayerMovement : MonoBehaviour
         // voeg een nieuwe kracht toe met forcemode op impulse, wat ervoor zorgt dat deze kracht
         // maar een keer wordt toegepast
         rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
+        
+        
     }
 
-    private void ResetJump() {
-        readyToJump = true;
+    private void CheckJump() {
 
-        exitingSlope = false;
+    
+        //checkt of de speler op de grond staat
+        if(grounded)
+        {
+            jumpsLeft = maxJumps;
+            readyToJump = true;
+            exitingSlope = false;
+        }
+        if(jumpsLeft > 0)
+        {
+            readyToJump = true;
+            exitingSlope = false;
+        }
+        else{
+            readyToJump = false;
+            exitingSlope = false;
+        }
     }
 
 

@@ -3180,6 +3180,8 @@ MonoBehaviour:
   jumpForce: 12.5
   jumpCooldown: 0.4
   airMultiplier: 0.15
+  maxJumps: 2
+  jumpsLeft: 2
   crouchSpeed: 7
   maxCrouchSpeed: 3.5
   crouchYScale: 0.5
