@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
+// using System.Numerics;
 using UnityEngine;
 using UnityEngine.AI;
 using static EnemyMovement;
@@ -13,6 +15,10 @@ public class EnemyMovement : MonoBehaviour
     public LayerMask whatIsGround, whatIsPlayer;
     public int health;
     
+
+
+    private bool shotByPlayer;
+    private Vector3 playerPosition;
 
 
     // patrolling state
@@ -96,7 +102,9 @@ public class EnemyMovement : MonoBehaviour
         }
 
         // debug
-        Debug.DrawRay(bulletSpawnpoint.position, directionToPlayer, Color.blue, 6f);
+        // Debug.DrawRay(bulletSpawnpoint.position, directionToPlayer, Color.blue, 6f);
+
+
 
 
 
@@ -105,23 +113,30 @@ public class EnemyMovement : MonoBehaviour
 
         if (attacking) {
             attacking = playerInLeaveAttackRange;
-            if (!hittable) attacking = false;
+            if (!hittable) attacking = false;  
         }
 
-        if (!playerInSightRange) {
+        if (!playerInSightRange && !shotByPlayer) {
             Patrolling();
             attacking = false;
         }
-        else if (!playerInAttackRange && !playerInLeaveAttackRange) ChasePlayer();
+        else if (!playerInAttackRange && !playerInLeaveAttackRange && playerInSightRange) {
+            ChasePlayer();
+        }
 
         if ((playerInAttackRange && playerInSightRange && hittable)|| attacking) {
             AttackPlayer();
             attacking = true;
         }
         else if (playerInAttackRange && playerInSightRange && !hittable)
-        {
+        {   
             ChasePlayer();
-            //Debug.Log("activated");
+        }
+
+
+        if (shotByPlayer) {
+            UnityEngine.Debug.Log("Going towards player shot position");
+            GotoShotDirection();
         }
         
     }
@@ -156,6 +171,20 @@ public class EnemyMovement : MonoBehaviour
 
 
 
+    private void GotoShotDirection() {
+        agent.SetDestination(playerPosition);
+
+        // controleer of de mogus al bij de positie is aangekomen
+        Vector3 distanceToWalkPoint = transform.position - playerPosition;
+
+        // zo ja, dan wordt shotByPlayer uitgezet
+        if (distanceToWalkPoint.magnitude < 1f) {
+            UnityEngine.Debug.LogWarning("Canceled shotByPlayer at GotoShotDirection (mogus reached its end point)");
+            shotByPlayer = false;
+        }
+    }
+
+
     private void SearchForWalkPoint() {
         // neem een willekeurige plek binnen een bepaalde range om heen te lopen
         float randomZ = Random.Range(-walkPointRange, walkPointRange);
@@ -171,6 +200,8 @@ public class EnemyMovement : MonoBehaviour
 
 
     private void ChasePlayer() {
+        if (shotByPlayer) UnityEngine.Debug.LogWarning("Cancelled shotByPlayer at ChasePlayer");
+        shotByPlayer = false;
         // loop naar de speler toe
         agent.SetDestination(player.position);
     }
@@ -193,6 +224,8 @@ public class EnemyMovement : MonoBehaviour
 
 
     private void AttackPlayer() {
+        if (shotByPlayer) UnityEngine.Debug.LogWarning("Cancelled shotByPlayer at AttackPlayer");
+        shotByPlayer = false;
 
         StartCoroutine(DelayChase());
 
@@ -256,7 +289,7 @@ public class EnemyMovement : MonoBehaviour
         Vector3 directionWithoutSpread = aimingPosition - bulletOrigin;
 
 
-        Debug.DrawLine(bulletOrigin, aimingPosition, Color.green, 2f);
+        UnityEngine.Debug.DrawLine(bulletOrigin, aimingPosition, Color.green, 2f);
 
         
 
@@ -304,7 +337,10 @@ public class EnemyMovement : MonoBehaviour
         health -= damage;
         if (health <= 0) Invoke("DestroyEnemy", 0.05f);
 
-        // Debug.Log("health: " + health.ToString());
+        // zorg dat de mogus in de richting gaat van waar hij beschoten was
+        shotByPlayer = true;
+        playerPosition = player.position;
+        UnityEngine.Debug.LogWarning("Shot by player is now true");
 
         
         // werkt nog niet, te lui (en momenteel te insignificant) om te fixen :)
