@@ -18,6 +18,7 @@ public class EnemySpawnController : MonoBehaviour
     private List<float> spawnQueueTimers = new List<float> {};
 
 
+
     void Start()
     {
         for (var i = 0; i < instancesToSpawnOnGameStart; i++) {

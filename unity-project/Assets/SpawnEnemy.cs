@@ -11,12 +11,33 @@ public class SpawnEnemy : MonoBehaviour
     [Header("Spawning")]
     public float maxSpawnRadius;
     public float maxNavmeshFindRange;
+    public float minPlayerDistance = 10f; 
+
+    private GameObject playerObj; 
+
+
+    private void Start() {
+        // define player object
+        playerObj = GameObject.Find("Player");
+    }
 
 
 
 
 
     public bool SpawnEnemyFunc() {
+        // check of de player niet te dicht bij de spawner is (zodat enemies niet in je gezicht spawnen)
+        Vector3 playerPos = playerObj.transform.position;
+        Vector3 vectorDistanceToPlayer = playerPos - transform.position;
+        float distanceToPlayer = vectorDistanceToPlayer.magnitude;
+
+        if (distanceToPlayer <= minPlayerDistance) {
+            Debug.Log("stopped mogus spawn, player too close");
+            return false;
+        }
+
+
+
         // pak een random enemy uit de enemy list
         var enemyPrefabsListInt = Random.Range(0, enemyPrefabs.Length);
 

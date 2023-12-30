@@ -33,8 +33,7 @@ public class AudioManager : MonoBehaviour
         }
 
 
-        Selftest();
-        Selftest();
+        // Selftest();
     }
 
     public void Play(string name) {
@@ -46,8 +45,12 @@ public class AudioManager : MonoBehaviour
             return;
         }
 
-        Debug.Log($"Sound: {s}, Source: {s.source}");
 
+
+        
+        Debug.Log($"Sound Name: {name}, Sound: {s}, Source: {s.source}");
+
+        // probeer het af te spelen
         try {
             s.source.Play();
         } catch (System.Exception error) {
@@ -55,6 +58,9 @@ public class AudioManager : MonoBehaviour
         }
     }
 
+
+
+    // om te kijken of alle sounds werken
     public void Selftest() {
         foreach (Sound s in sounds) {
             Debug.Log($"Sound: {s}, Source: {s.source}");

@@ -101,3 +101,4 @@ MonoBehaviour:
   - {fileID: 768649175047687483, guid: 6a569907e18f8bc42aea2404edc485b1, type: 3}
   maxSpawnRadius: 2
   maxNavmeshFindRange: 3
+  minPlayerDistance: 7

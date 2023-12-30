@@ -5,6 +5,7 @@ using System.Diagnostics;
 using UnityEngine;
 using UnityEngine.AI;
 using static EnemyMovement;
+using static AudioManager;
 
 
 public class EnemyMovement : MonoBehaviour
@@ -65,14 +66,16 @@ public class EnemyMovement : MonoBehaviour
     public GameObject reticleGameObject;
 
 
-    [Header("Sound")]
-    public GameObject audioManager;
+
+    private AudioManager audioManager;
     
 
     private void Awake() {
         // vind de speler
         player = GameObject.Find("PlayerObj").transform;
         agent = GetComponent<NavMeshAgent>();
+
+        audioManager = GameObject.Find("AudioManager").GetComponent<AudioManager>();
     }
 
 
@@ -135,7 +138,7 @@ public class EnemyMovement : MonoBehaviour
 
 
         if (shotByPlayer) {
-            UnityEngine.Debug.Log("Going towards player shot position");
+            // UnityEngine.Debug.Log("Going towards player shot position");
             GotoShotDirection();
         }
         
@@ -179,7 +182,7 @@ public class EnemyMovement : MonoBehaviour
 
         // zo ja, dan wordt shotByPlayer uitgezet
         if (distanceToWalkPoint.magnitude < 1f) {
-            UnityEngine.Debug.LogWarning("Canceled shotByPlayer at GotoShotDirection (mogus reached its end point)");
+            // UnityEngine.Debug.LogWarning("Canceled shotByPlayer at GotoShotDirection (mogus reached its end point)");
             shotByPlayer = false;
         }
     }
@@ -200,7 +203,7 @@ public class EnemyMovement : MonoBehaviour
 
 
     private void ChasePlayer() {
-        if (shotByPlayer) UnityEngine.Debug.LogWarning("Cancelled shotByPlayer at ChasePlayer");
+        // if (shotByPlayer) UnityEngine.Debug.LogWarning("Cancelled shotByPlayer at ChasePlayer");
         shotByPlayer = false;
         // loop naar de speler toe
         agent.SetDestination(player.position);
@@ -224,7 +227,7 @@ public class EnemyMovement : MonoBehaviour
 
 
     private void AttackPlayer() {
-        if (shotByPlayer) UnityEngine.Debug.LogWarning("Cancelled shotByPlayer at AttackPlayer");
+        // if (shotByPlayer) UnityEngine.Debug.LogWarning("Cancelled shotByPlayer at AttackPlayer");
         shotByPlayer = false;
 
         StartCoroutine(DelayChase());
@@ -334,17 +337,18 @@ public class EnemyMovement : MonoBehaviour
     
 
     public void TakeDamage(int damage) {
+        
         health -= damage;
         if (health <= 0) Invoke("DestroyEnemy", 0.05f);
 
         // zorg dat de mogus in de richting gaat van waar hij beschoten was
         shotByPlayer = true;
         playerPosition = player.position;
-        UnityEngine.Debug.LogWarning("Shot by player is now true");
 
         
-        // werkt nog niet, te lui (en momenteel te insignificant) om te fixen :)
-        // audioManager.GetComponent<AudioManager>().Play("bullet hit");
+        // speelt als het goed is geluid af
+        // audioManager.Play("bullet hit");
+        // UnityEngine.Debug.LogWarning("Enemy is hit!");
     }
 
     private void DestroyEnemy() {

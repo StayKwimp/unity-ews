@@ -298,7 +298,7 @@ public class PlayerGun : MonoBehaviour
 
         // apply de recoil op elke camera
         for (int i = 0; i < camerasForRecoil.Length; i++) {
-            Debug.Log($"Apply recoil amount {recoilAmount} on camera {camerasForRecoil[i]}");
+            // Debug.Log($"Apply recoil amount {recoilAmount} on camera {camerasForRecoil[i]}");
             camerasForRecoil[i].SmoothRotateCameraInit(0f, recoilAmount, 1.08f);
         }
     }
@@ -419,7 +419,7 @@ public class PlayerGun : MonoBehaviour
 
 
     public void PlaySound(string name) {
-        Debug.Log($"Play sound: {name}");
+        // Debug.Log($"Play sound: {name}");
         audioManager.GetComponent<AudioManager>().Play(name);
     }
 
