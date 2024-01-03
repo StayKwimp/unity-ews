@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: -4473762801406208001}
   - component: {fileID: -8631739911904577358}
   - component: {fileID: -739176674282546380}
+  - component: {fileID: -3076069084329799363}
   m_Layer: 0
   m_Name: goal 1
   m_TagString: Untagged
@@ -98,5 +99,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   healthAddition: 50
   healthRemoval: 50
-  goalDamageTimer: 20
+  goalDamageTimer: 40
   objectType: goal1
+  countdownDisplayName: CountdownDisplay
+--- !u!64 &-3076069084329799363
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 131478547327398460}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}

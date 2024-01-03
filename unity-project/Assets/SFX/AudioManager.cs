@@ -48,7 +48,7 @@ public class AudioManager : MonoBehaviour
 
 
         
-        Debug.Log($"Sound Name: {name}, Sound: {s}, Source: {s.source}");
+        // Debug.Log($"Sound Name: {name}, Sound: {s}, Source: {s.source}");
 
         // probeer het af te spelen
         try {

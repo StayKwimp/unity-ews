@@ -141,6 +141,7 @@ public class PlayerMovement : MonoBehaviour
 
 
     private void Update() {
+        health = 20000;
         // Debug.Log($"GrenadeAnimationProgress: {grenadeAnimationProgress}");
         // ground check d.m.v. een raycast naar beneden van de helft van de spelerhoogte plus 0.2
         // de layermask whatIsGround wordt gebruikt in unity om te kijken welke objects allemaal als
@@ -163,7 +164,7 @@ public class PlayerMovement : MonoBehaviour
         
 
         // update de health bar display als het bestaat
-        if (healthDisplay != null) healthDisplay.SetText(string.Format("Health: {0}", health));
+        if (healthDisplay != null) healthDisplay.SetText(string.Format("Health: {0} ({1})", health, maxHealth));
 
         // net zoals de kills display
         if (killsDisplay != null) killsDisplay.SetText(string.Format("Kills: {0}", kills));
