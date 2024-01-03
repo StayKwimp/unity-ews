@@ -593,7 +593,7 @@ public class PlayerMovement : MonoBehaviour
 
             // uncomment dit hieronder en comment dit hierboven voor full releases!
 
-            // SceneManager.LoadScene("Deathmenu");
+            SceneManager.LoadScene("Deathmenu");
         }
     }
 }

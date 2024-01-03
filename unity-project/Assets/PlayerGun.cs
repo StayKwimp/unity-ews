@@ -115,7 +115,11 @@ public class PlayerGun : MonoBehaviour
         
         if (switchGunPosAnimationTime <= 0) {
             Debug.LogError("PlayerGun: switchGunPosAnimationTime may not be 0 or smaller than 0");
-            UnityEditor.EditorApplication.isPlaying = false;
+
+            // comment dit hieronder voor build
+            // UnityEditor.EditorApplication.isPlaying = false;
+
+
             Application.Quit();
         }
     }

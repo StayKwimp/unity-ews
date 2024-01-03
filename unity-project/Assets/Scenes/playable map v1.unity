@@ -3445,8 +3445,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a932fa3d3c8c1049bae4973e4176ea3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sensX: 1500
-  sensY: 1500
+  sensX: 800
+  sensY: 800
   playerGun: {fileID: 537361547}
   sensMultiplierOnADS: 0.5
   orientation: {fileID: 3240804982353070387}
@@ -4563,7 +4563,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2761702954008720919, guid: 48ede168ac805224ea92d103c55cc7c6, type: 3}
       propertyPath: spread
-      value: 0.5
+      value: 0.4
       objectReference: {fileID: 0}
     - target: {fileID: 2761702954008720919, guid: 48ede168ac805224ea92d103c55cc7c6, type: 3}
       propertyPath: bulletScr
