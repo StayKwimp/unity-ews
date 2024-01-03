@@ -385,7 +385,7 @@ MonoBehaviour:
   playerInAttackRange: 0
   playerInLeaveAttackRange: 0
   reticleGameObject: {fileID: 8424799368891404047, guid: d9b98cd157b482305883be04bb4a6062, type: 3}
-  audioManager: {fileID: 852120296705119213, guid: 6efa428e0940f274c8a371496743bf08, type: 3}
+  healthBoost: 10
 --- !u!195 &1899783556758808073
 NavMeshAgent:
   m_ObjectHideFlags: 0

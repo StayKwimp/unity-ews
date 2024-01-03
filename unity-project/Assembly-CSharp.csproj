@@ -61,6 +61,8 @@
      <Compile Include="Assets/MogusExplosiveBullet.cs" />
      <Compile Include="Assets/MuzzleFlashMovement.cs" />
      <Compile Include="Assets/EnemySpawnController.cs" />
+     <Compile Include="Assets/goalSpawner.cs" />
+     <Compile Include="Assets/goalScript.cs" />
      <None Include="Assets/UnityTechnologies/ParticlePack/TextMesh Pro/Shaders/TMPro.cginc" />
      <None Include="Assets/UnityTechnologies/ParticlePack/TextMesh Pro/Shaders/TMP_SDF-Mobile Overlay.shader" />
      <None Include="Assets/UnityTechnologies/ParticlePack/TextMesh Pro/Shaders/TMP_Bitmap.shader" />

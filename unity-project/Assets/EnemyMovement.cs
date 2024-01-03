@@ -65,6 +65,8 @@ public class EnemyMovement : MonoBehaviour
     [Header("Reticle Coloring")]
     public GameObject reticleGameObject;
 
+    [Header("Healing upon death")]
+    public int healthBoost;
 
 
     private AudioManager audioManager;
@@ -352,6 +354,10 @@ public class EnemyMovement : MonoBehaviour
     }
 
     private void DestroyEnemy() {
+        if (GameObject.Find("Player").GetComponent<PlayerMovement>().health <= GameObject.Find("Player").GetComponent<PlayerMovement>().maxHealth)
+        {
+            GameObject.Find("Player").GetComponent<PlayerMovement>().health += healthBoost;
+        }
         Destroy(gameObject);
 
         // voeg een kill toe
