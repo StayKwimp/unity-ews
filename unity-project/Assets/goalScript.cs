@@ -47,23 +47,37 @@ public class goalScript : MonoBehaviour
 
     public void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Player"))
+        if(objectType == "goal")
         {
-            if(GameObject.Find("Player").GetComponent<PlayerMovement>().maxHealth < 200)
+            if (collision.gameObject.CompareTag("Player"))
             {
-                GameObject.Find("Player").GetComponent<PlayerMovement>().maxHealth += healthAddition;
-                if(objectType == "goal")
-                    {
-                        GameObject.Find("GoalSpawner")?.GetComponent<goalSpawner>()?.SpawnGoal();
-                    }
-                    else if(objectType == "goal1")
-                    {
-                        GameObject.Find("GoalSpawner2")?.GetComponent<goalSpawner>()?.SpawnGoal();
-                    }
+                Debug.Log("itworks");
+                if(GameObject.Find("Player").GetComponent<PlayerMovement>().maxHealth < 200)
+                {
+                    GameObject.Find("Player").GetComponent<PlayerMovement>().maxHealth += healthAddition;
+                    GameObject.Find("GoalSpawner")?.GetComponent<goalSpawner>()?.SpawnGoal();
+                }
+                else{
+                    GameObject.Find("GoalSpawner")?.GetComponent<goalSpawner>()?.SpawnGoal();
+                }
             }
-            
-            Invoke("DestroySelf", 0.1f);
         }
+        else if(objectType == "goal1")
+        {
+            Debug.Log("itworks");
+            if (collision.gameObject.CompareTag("Player"))
+            {
+                if(GameObject.Find("Player").GetComponent<PlayerMovement>().maxHealth < 200)
+                {
+                    GameObject.Find("Player").GetComponent<PlayerMovement>().maxHealth += healthAddition;
+                    GameObject.Find("GoalSpawner2")?.GetComponent<goalSpawner>()?.SpawnGoal();
+                }
+                else {
+                    GameObject.Find("GoalSpawner2")?.GetComponent<goalSpawner>()?.SpawnGoal();
+                }
+            }
+        }
+        Destroy(gameObject);
     }
     
     void Lowermaxhealth()
@@ -79,11 +93,6 @@ public class goalScript : MonoBehaviour
             GameObject.Find("GoalSpawner2")?.GetComponent<goalSpawner>()?.SpawnGoal();
         }
         
-        Invoke("DestroySelf", 0.1f);
-    }
-
-
-    private void DestroySelf() {
         Destroy(gameObject);
     }
 }
