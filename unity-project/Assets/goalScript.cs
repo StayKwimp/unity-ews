@@ -15,6 +15,7 @@ public class goalScript : MonoBehaviour
 
     [Header("TMPro")]
     public string countdownDisplayName;
+    public int objectiveNumber;
     private TextMeshProUGUI countdownDisplay;
 
     private GameObject playerObj;
@@ -41,17 +42,24 @@ public class goalScript : MonoBehaviour
 
         float timeRemaining = goalDamageTimer - timePassed;
         if (countdownDisplay != null){
-            countdownDisplay.SetText($"Time remaining: {(int)timeRemaining}s");
+            countdownDisplay.SetText($"Objective {objectiveNumber} time remaining: {(int)timeRemaining}s");
         }
     }
 
     public void OnCollisionEnter(Collision collision)
     {
+        // update de countdowndisplay
+        if (countdownDisplay != null){
+            countdownDisplay.SetText($"Objective {objectiveNumber} time remaining: **Clear**");
+        }
+
+
+        // ik krijg nog steeds de kriebels van deze code
         if(objectType == "goal")
         {
             if (collision.gameObject.CompareTag("Player"))
             {
-                Debug.Log("itworks");
+                // Debug.Log("itworks");
                 if(GameObject.Find("Player").GetComponent<PlayerMovement>().maxHealth < 200)
                 {
                     GameObject.Find("Player").GetComponent<PlayerMovement>().maxHealth += healthAddition;
@@ -64,7 +72,7 @@ public class goalScript : MonoBehaviour
         }
         else if(objectType == "goal1")
         {
-            Debug.Log("itworks");
+            // Debug.Log("itworks");
             if (collision.gameObject.CompareTag("Player"))
             {
                 if(GameObject.Find("Player").GetComponent<PlayerMovement>().maxHealth < 200)
@@ -82,6 +90,13 @@ public class goalScript : MonoBehaviour
     
     void Lowermaxhealth()
     {
+
+        // update de countdowndisplay
+        if (countdownDisplay != null){
+            countdownDisplay.SetText($"Objective {objectiveNumber} time remaining: **Clear**");
+        }
+
+
         Debug.Log("lowermaxhealth runs");
         GameObject.Find("Player").GetComponent<PlayerMovement>().maxHealth -= healthRemoval;
         if(objectType == "goal")

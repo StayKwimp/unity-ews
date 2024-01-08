@@ -141,7 +141,6 @@ public class PlayerMovement : MonoBehaviour
 
 
     private void Update() {
-        health = 20000;
         // Debug.Log($"GrenadeAnimationProgress: {grenadeAnimationProgress}");
         // ground check d.m.v. een raycast naar beneden van de helft van de spelerhoogte plus 0.2
         // de layermask whatIsGround wordt gebruikt in unity om te kijken welke objects allemaal als

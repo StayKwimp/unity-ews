@@ -99,9 +99,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   healthAddition: 50
   healthRemoval: 50
-  goalDamageTimer: 40
+  goalDamageTimer: 60
   objectType: goal
   countdownDisplayName: CountdownDisplay
+  objectiveNumber: 1
 --- !u!64 &-9114682391420816084
 MeshCollider:
   m_ObjectHideFlags: 0
